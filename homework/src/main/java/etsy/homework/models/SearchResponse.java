@@ -41,6 +41,10 @@ public class SearchResponse {
         return mPagination;
     }
 
+    public static boolean isValid() {
+        return true;
+    }
+
     public static final class Keys {
         public static final String COUNT = "count";
         public static final String RESULTS = "results";

@@ -23,6 +23,7 @@ public class SearchResultsView {
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.LISTING_ID + " AS " + BaseColumns._ID + ", " +
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.DESCRIPTION + " AS " + Columns.DESCRIPTION + ", " +
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.TITLE + " AS " + Columns.TITLE + ", " +
+            ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.PRICE + " AS " + Columns.PRICE + ", " +
             KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.KEYWORD + " AS " + Columns.KEYWORD + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_75_X_75 + " AS " + Columns.URL_75_X_75 + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_75_X_75 + " AS " + Columns.URL_75_X_75 + ", " +

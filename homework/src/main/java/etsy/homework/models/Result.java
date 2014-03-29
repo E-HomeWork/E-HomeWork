@@ -1,6 +1,10 @@
 package etsy.homework.models;
 
+import android.content.ContentValues;
+
 import com.google.gson.annotations.SerializedName;
+
+import etsy.homework.database.tables.ResultsTable;
 
 /**
  * Created by emir on 28/03/14.
@@ -27,6 +31,16 @@ public class Result {
         mPrice = price;
         mQuantity = quantity;
         mMainImage = mainImage;
+    }
+
+    public ContentValues getContentValues(){
+        final ContentValues value = new ContentValues();
+        value.put(ResultsTable.Columns.LISTING_ID, getListingId());
+        value.put(ResultsTable.Columns.TITLE, getTitle());
+        value.put(ResultsTable.Columns.DESCRIPTION, getDescription());
+        value.put(ResultsTable.Columns.PRICE, getPrice());
+        value.put(ResultsTable.Columns.QUANTITY, getQuantity());
+        return value;
     }
 
     public Long getListingId() {

@@ -47,7 +47,7 @@ public class SearchResultsAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         bindTextView(view, R.id.list_item_search_result_title, cursor, SearchResultsView.Columns.TITLE);
         bindTextView(view, R.id.list_item_search_result_price, cursor, SearchResultsView.Columns.PRICE);
-        bindImageView(context, view, R.id.list_item_search_result_imageView, cursor, SearchResultsView.Columns.URL_FULL_X_FULL);
+        bindImageView(context, view, R.id.list_item_search_result_imageView, cursor, SearchResultsView.Columns.URL_170_X_135);
 
     }
 

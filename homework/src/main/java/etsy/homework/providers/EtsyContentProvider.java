@@ -21,20 +21,19 @@ import etsy.homework.database.tables.MainImageTable;
 import etsy.homework.database.tables.ResultsTable;
 import etsy.homework.database.tables.TasksTable;
 import etsy.homework.database.views.SearchResultsView;
+import etsy.homework.services.EtsyService;
 
 /**
  * Created by emir on 28/03/14.
  */
 public class EtsyContentProvider extends ContentProvider {
 
-    private static final String MIME_TYPE = "mime_type";
-    private static final long STALE_DATA_THRESHOLD = 1000 * 30; // 30 seconds
-
     public static final String AUTHORITY = "etsy.homework.authority";
     public static final String CONTENT = "content://";
     public static final String TASK_URI = "taskUri";
     public static final String FORCE_REQUEST = "forceRequest";
-
+    private static final String MIME_TYPE = "mime_type";
+    private static final long STALE_DATA_THRESHOLD = 1000 * 30; // 30 seconds
     private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private String getTableName(final Uri uri) {
@@ -66,7 +65,14 @@ public class EtsyContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        final Context context = getContext();
+        final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
+        final String tableName = getTableName(uri);
+        final Cursor cursor = sqLiteDatabase.query(tableName, projection, selection, selectionArgs, sortOrder, null, null);
+
+        launchTask(uri, cursor);
+
+        return cursor;
     }
 
     @Override
@@ -80,7 +86,8 @@ public class EtsyContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         final Context context = getContext();
         final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
-        final long id = sqLiteDatabase.insert(getTableName(uri), null, values);
+        final String tableName = getTableName(uri);
+        final long id = sqLiteDatabase.insert(tableName, null, values);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -88,7 +95,8 @@ public class EtsyContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         final Context context = getContext();
         final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
-        final int numRowsDeleted = sqLiteDatabase.delete(getTableName(uri), selection, selectionArgs);
+        final String tableName = getTableName(uri);
+        final int numRowsDeleted = sqLiteDatabase.delete(tableName, selection, selectionArgs);
         return numRowsDeleted;
     }
 
@@ -96,7 +104,8 @@ public class EtsyContentProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         final Context context = getContext();
         final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
-        final int numRowsAffected = sqLiteDatabase.update(getTableName(uri), values, selection, selectionArgs);
+        final String tableName = getTableName(uri);
+        final int numRowsAffected = sqLiteDatabase.update(tableName, values, selection, selectionArgs);
         return numRowsAffected;
     }
 
@@ -112,6 +121,29 @@ public class EtsyContentProvider extends ContentProvider {
         } finally {
             sqLiteDatabase.endTransaction();
         }
-
     }
+
+    private void launchTask(final Uri uri, final Cursor cursor) {
+        final int match = mURIMatcher.match(uri);
+        switch (match) {
+            case TasksTable.CODE:
+                boolean launchNetworkRequest = true;
+                if (cursor.moveToFirst()) {
+                    final int timeColumnIndex = cursor.getColumnIndex(TasksTable.Columns.TIME);
+                    final long time = cursor.getLong(timeColumnIndex);
+                    final long duration = Math.abs(System.currentTimeMillis() - time);
+                    launchNetworkRequest = duration > STALE_DATA_THRESHOLD;
+                }
+                final String uriString = uri.getQueryParameter(TASK_URI);
+                final String forceRequestString = uri.getQueryParameter(FORCE_REQUEST);
+                final boolean forceRequest = forceRequestString != null && Boolean.parseBoolean(forceRequestString);
+                launchNetworkRequest = forceRequest || launchNetworkRequest && uriString != null;
+
+                if (launchNetworkRequest) {
+                    final Uri taskUri = Uri.parse(uriString);
+                    EtsyService.startTask(getContext(), taskUri);
+                }
+        }
+    }
+
 }

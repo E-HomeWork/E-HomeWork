@@ -2,6 +2,7 @@ package etsy.homework.database.tables;
 
 import android.net.Uri;
 
+import etsy.homework.models.KeywordResultRelationship;
 import etsy.homework.models.MainImage;
 import etsy.homework.providers.EtsyContentProvider;
 
@@ -11,7 +12,7 @@ import etsy.homework.providers.EtsyContentProvider;
 public class KeywordResultRelationshipTable {
 
     public static final int CODE = 4;
-    public static String TABLE_NAME = "mainImage";
+    public static String TABLE_NAME = "keywordResultRelationship";
     public static final String DROP = " DROP TABLE IF EXISTS " + TABLE_NAME;
     public static final String URI_PATH = TABLE_NAME;
     public static final Uri URI = Uri.parse(EtsyContentProvider.CONTENT + EtsyContentProvider.AUTHORITY + "/" + TABLE_NAME);
@@ -22,8 +23,8 @@ public class KeywordResultRelationshipTable {
             ");";
 
     public static final class Columns {
-        public static final String LISTING_ID = MainImage.Keys.LISTING_ID;
-        public static final String KEYWORD = "keyword";
+        public static final String LISTING_ID = KeywordResultRelationship.Keys.LISTING_ID;
+        public static final String KEYWORD = KeywordResultRelationship.Keys.KEYWORD;
     }
 
 }

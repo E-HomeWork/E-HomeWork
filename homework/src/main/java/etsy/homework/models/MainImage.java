@@ -1,6 +1,11 @@
 package etsy.homework.models;
 
+import android.content.ContentValues;
+
 import com.google.gson.annotations.SerializedName;
+
+import etsy.homework.database.tables.MainImageTable;
+import etsy.homework.database.tables.ResultsTable;
 
 /**
  * Created by emir on 28/03/14.
@@ -51,6 +56,17 @@ public class MainImage {
 
     public String getUrlFullXFull() {
         return mUrlFullXFull;
+    }
+
+    public ContentValues getContentValues() {
+        final ContentValues value = new ContentValues();
+        value.put(MainImageTable.Columns.LISTING_ID, getListingId());
+        value.put(MainImageTable.Columns.LISTING_IMAGE_ID, getListingImageId());
+        value.put(MainImageTable.Columns.URL_75_X_75, getUrl75X75());
+        value.put(MainImageTable.Columns.URL_170_X_135, getUrl170X135());
+        value.put(MainImageTable.Columns.URL_570_X_N, getUrl570XN());
+        value.put(MainImageTable.Columns.URL_FULL_X_FULL, getUrlFullXFull());
+        return value;
     }
 
     public static final class Keys {

@@ -1,4 +1,4 @@
-package etsy.homework.service;
+package etsy.homework.services;
 
 import android.app.Service;
 import android.content.Context;
@@ -8,8 +8,7 @@ import android.os.IBinder;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import etsy.homework.database.tables.ResultsTable;
-import etsy.homework.service.tasks.SearchTask;
+import etsy.homework.tasks.SearchTask;
 
 /**
  * Created by emir on 28/03/14.
@@ -18,11 +17,7 @@ public class EtsyService extends Service {
     private static final int THREAD_POOL_SIZE = 4;
     private static final ScheduledThreadPoolExecutor mSheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(THREAD_POOL_SIZE);
 
-    private static final class EXTRAS {
-        public static final String URI = "uri";
-    }
-
-    public static void startTask(final Context context, final Uri uri){
+    public static void startTask(final Context context, final Uri uri) {
         final String uriString = uri.toString();
 
         final Intent intent = new Intent(context, EtsyService.class);
@@ -48,7 +43,7 @@ public class EtsyService extends Service {
 
         final String uriString = intent.getStringExtra(EXTRAS.URI);
         final Uri uri = Uri.parse(uriString);
-        if (uri.equals(ResultsTable.URI)) {
+        if (uri.equals(SearchTask.URI)) {
             final SearchTask searchTask = new SearchTask(getApplicationContext(), uri);
             mSheduledThreadPoolExecutor.execute(searchTask);
         }
@@ -57,5 +52,9 @@ public class EtsyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    private static final class EXTRAS {
+        public static final String URI = "uri";
     }
 }

@@ -1,4 +1,4 @@
-package etsy.homework.service.tasks;
+package etsy.homework.rest.tasks;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -13,13 +13,13 @@ import etsy.homework.database.tables.TasksTable;
 /**
  * Created by emir on 28/03/14.
  */
-public abstract class EtsyTask implements Runnable{
+public abstract class RestTask implements Runnable{
     private final Context mContext;
     private final Uri mTaskId;
 
     public static final Gson GSON = new Gson();
 
-    public EtsyTask(final Context context, final Uri taskId) {
+    public RestTask(final Context context, final Uri taskId) {
         mContext = context;
         mTaskId = taskId;
     }
@@ -53,7 +53,7 @@ public abstract class EtsyTask implements Runnable{
         contentValues.put(TasksTable.Columns.TASK_ID, mTaskId.toString());
         contentValues.put(TasksTable.Columns.TIME, System.currentTimeMillis());
 
-        // THE FOLLOWING NEEDS TO BE ATOMIC
+        //TODO: THE FOLLOWING NEEDS TO BE ATOMIC
         final int rows = contentResolver.update(TasksTable.URI, contentValues, whereClause, whereArguments);
         if (rows == 0) {
             final String queryWhereClause = TasksTable.Columns.TASK_ID + "=? AND " + TasksTable.Columns.STATE + "=?";

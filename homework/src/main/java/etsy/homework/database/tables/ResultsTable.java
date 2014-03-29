@@ -20,7 +20,6 @@ public class ResultsTable {
             Columns.LISTING_ID + " INTEGER, " +
             Columns.TITLE + " varchar(255), " +
             Columns.DESCRIPTION + " varchar(255), " +
-            Columns.DESCRIPTION + "	varchar(255), " +
             Columns.PRICE + " varchar(255), " +
             Columns.QUANTITY + " INTEGER " +
             ");";
