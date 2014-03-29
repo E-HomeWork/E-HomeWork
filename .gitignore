@@ -1,0 +1,23 @@
+# Platform files
+.DS_Store
+
+# IDE directories
+bin/
+out/
+gen/
+gen-external-apklibs/
+target/
+build/
+classes/
+libs/
+gradle/
+.idea/
+
+# IDE files
+*.iml
+.gradle/
+local.properties
+gradle.properties
+gradlew
+gradlew.bat
+
