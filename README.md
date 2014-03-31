@@ -1,16 +1,16 @@
-##WORK IS STILL IN PROGRESS!!
+#WORK IS STILL IN PROGRESS!!
 
 Below I document some of the thought processes that go into each iteration of this applicaiton. When the application is complete, I will remove the "WORK IN PROGRESS!!" banner.
 
-## Etsy HomeWork
+# Etsy HomeWork
 
 The following will explain the choices made throughout the application, please feel free to follow up on any questions you may have.
 
-## Data flow
+# Data flow
 
 The app in question attempts to follow an MVVM structure while using a REST technique for local data caching.
 
-# REST
+## REST
 
 The hardest problem to solve for developers is how to deal with data and the Activity life cycle. The first problem is how to resolve and synchronize a background threads running network requests after an Activity has been destroyed and another has been craeted. The other how to handle the resulting data between rotations without using too much memory and without making too many mistakes while keeping track of that data.
 
@@ -37,7 +37,7 @@ Point three means that we can get as intricate as we want with the distribution 
 2. When we receive data, we atomically delete all of the previous data and write in the new data. This ensures that if an loader reads the database while a new set of data is coming in, that it only sees a complete set of data and not the intermediate state of the delete and write mentioned previously.
 
 
-# MVVM
+## MVVM
 
 MVVM can be greatly beneficial if used correctly. When compared to MVC, I find that MVVM can greatly simplify the code at the Fragment and Activity level. As a rule of thumb, I only try to have logic that pertains to application flow, animations and UI/UX state at the Activity and Fragment levels. The majority, if not all, of the business logic is done inside SQL.
 
@@ -54,10 +54,10 @@ The data is queried and sent down to the adapter where each View is paired with 
 The beauty of this is that you are now free to modify either the Model, the View Model or the view separately from one another without breaking the flow of the application. I find that this really helps for growing projects and new comers to Android, as you can give them very confined problems to solve without having to know about the entire stack.
 
 
-## General considerations when choosing libraries, flows and techniques
+# General considerations when choosing libraries, flows and techniques
 
 
-# Parsing
+## Parsing
 
 For memory and efficiency proposes I have used GSON. A library that SAX parses the network calls. JSONObject is a DOM parser that always forms contiguous Strings in memory that represent the JSON. I've seen JSON parse large sets of data and fragment memory significantly enough that it causes OutOfMemory Exceptions.
 
@@ -65,7 +65,7 @@ GSON allows you to build objects (with easy to use annotations) in memory withou
 
 The alternative is to parse the data manually and store it into the data base as you go, avoiding putting the entire model into memory at once. In the case of this application, and most applications, the time it would have taken to write the parsing manually would not make the trade off of less memory consumption worth it.
 
-# Logging
+## Logging
 
 In the application above, the REST / MVVM framework built proved difficult to debug as there were several threads running at the same time. The simplest way of testing the flow in a production environment was to write logs and observe their order afterwards.
 
@@ -80,7 +80,12 @@ The benefits of logging in this manner:
 2. Greping becomes a lot more fun as you can grep per package, per class name per application etc...
 
 
-# Known issues
+## Images
+
+Using Picasso, didn't feel that I needed to reinvent the wheel on this one.
+
+
+##Known issues
 
 I'm not quite happy with the way I'm using my Constants, although each constant technically is in the class that it represents, it is getting difficult, especially with URIS, SCHEMAS, and AUTHORITIES, to keep track of where each one should be.
 
