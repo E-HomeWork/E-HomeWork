@@ -12,14 +12,16 @@ The app in question attempts to follow an MVVM structure while using a REST tech
 
 ## REST
 
-The hardest problem to solve for developers is how to deal with data and the Activity life cycle. The first problem is how to resolve and synchronize a background threads running network requests after an Activity has been destroyed and another has been craeted. The other how to handle the resulting data between rotations without using too much memory and without making too many mistakes while keeping track of that data.
+The hardest problem to solve for developers is how to deal with data and the Activity life cycle. The first problem is how to resolve and synchronize background threads running network requests after an Activity has been destroyed and another has been craeted. The other is how to handle saving data between rotations without using too much memory and without making too many mistakes while keeping track of that data.
 
-The most elegant solution I've come across is the use of REST. We use a local database to store the data and serve it to the views. When the views are created, they simply register for an Observable on a URI that represents their data, query the latest data and wait for notifications that let them know their data is available. At which point they re-query the data set in question.
+The most elegant solution I've come across is the use of REST. We use a local database to store the data and serve it to the views. When the views are created, they simply register for an Observable on a URI that represents their data, query the latest data and wait for notifications that let them know new data is available. At which point they re-query the data set in question.
 
 Assuming that data retrieved from the local database is always up to date this seemingly solves the problem.
 
 The trick is to use Loaders and Observables. Loaders are an Android construct that are designed to work with the LifeCycle. They go off of the UI thread to retrieve data from a database and return to the UI thread with the results. They also know how to attach and detach from the same Activity in case of a rotation/life cycle event.
 
+
+## Database 
 
 The database allows for three things:
 
@@ -30,24 +32,29 @@ The database allows for three things:
 3. More importantly, they are thread safe and can complete atomic read and writes.
 
 
-Point three means that we can get as intricate as we want with the distribution of our work between processes but still have a simple and clean way to read and write data. This also means that we can create happens-before relationships between our data flow. There are two good examples of using the atomic read and writes in the code base:
+Point three means that we can get as intricate as we want with the distribution of our work between processes and thread, but still have a simple and clean way to read and write data. This also means that we can create happens-before relationships between our data flow. There are two good examples of using the atomic read and writes in the code base:
 
 1. Before we run a network call, we atomically check to see if there is already a network call running. If there is we exit, if there is not, we write (in that same atomic block) that a network call is running and then run the network call. This ensures that in case we run several threads that are trying to run the same network request, that only one gets run.
 
-2. When we receive data, we atomically delete all of the previous data and write in the new data. This ensures that if an loader reads the database while a new set of data is coming in, that it only sees a complete set of data and not the intermediate state of the delete and write mentioned previously.
+2. When we receive data, we atomically delete all of the previous data and write in the new data. This ensures that if a loader reads the database while a new set of data is coming in, that it only sees a complete set of data and not the intermediate state of the delete and write mentioned previously.
 
 
 ## MVVM
 
 MVVM can be greatly beneficial if used correctly. When compared to MVC, I find that MVVM can greatly simplify the code at the Fragment and Activity level. As a rule of thumb, I only try to have logic that pertains to application flow, animations and UI/UX state at the Activity and Fragment levels. The majority, if not all, of the business logic is done inside SQL.
 
-The way I accomplish this in the current code base is by using tables strictly for storing data that comes from the network requests. By rul of thumb I store them in such a way that if I need to recreate the entire network request structure and its relationships, I can.
+### Model
+
+The way I accomplish this in the current code base is by using tables strictly for storing data that comes from the network requests. By rule of thumb I store them in such a way that if I need to recreate the entire network request structure and its relationships, I can.
+
+### View Model
 
 SQL Views are then used to query these tables appropriately and create data that is strictly designed to be consumed by the Views that it will be binding to. More importantly, the job of this SQL view is to prepare the data in such a way that there is almost no logic to be done from the point of the View.
 
+
 For example:
 
-In the app, we have have a loader that connects to and displays the data for search results from the SearchResultsView. The SearchResultsView is set up so that it contains all of the results associated with their respective queries. The view can have search results for both dogs and cats, which gives the ability to the Loader to simply say that it wants results for cats.
+In the app, we have have a loader that connects to and displays the data for search results from the SearchResultsView. The SearchResultsView is set up so that it contains all of the results associated with their respective queries. The view can have results for both dogs and cats, which gives the ability to the Loader to simply say that it wants results for cats.
 
 The data is queried and sent down to the adapter where each View is paired with a row of the results. The adapter simply binds the data to the corresponding View and the work is done.
 
@@ -59,11 +66,11 @@ The beauty of this is that you are now free to modify either the Model, the View
 
 ## Parsing
 
-For memory and efficiency proposes I have used GSON. A library that SAX parses the network calls. JSONObject is a DOM parser that always forms contiguous Strings in memory that represent the JSON. I've seen JSON parse large sets of data and fragment memory significantly enough that it causes OutOfMemory Exceptions.
+For memory and efficiency purposes, I have used GSON. GSON is a library that SAX parses the network calls. JSONObject is a DOM parser that always forms contiguous Strings in memory that represent the JSON. I've seen JSONObject parse large sets of data and fragment memory significantly enough that it causes OutOfMemory Exceptions. Therefore I have chosen GSON as my go to parser.
 
-GSON allows you to build objects (with easy to use annotations) in memory without using a contiguous String to represent the JSON, which considerably cuts down on the possibility of Fragmentation.
+GSON allows you to build objects (with easy to use annotations) in memory without using a contiguous String to represent the JSON, which considerably cuts down on the possibility of memory fragmentation.
 
-The alternative is to parse the data manually and store it into the data base as you go, avoiding putting the entire model into memory at once. In the case of this application, and most applications, the time it would have taken to write the parsing manually would not make the trade off of less memory consumption worth it.
+The alternative is to parse the data manually and store it into the database as you go, avoiding putting the entire model into memory at once. In the case of this application, and most applications, the time it would have taken to write the parsing and incremental saving manually would not make the trade off betweeb time spent coding and memory consumption worth it.
 
 ## Logging
 
@@ -93,6 +100,6 @@ I'm currently not using the selection and selectionArgs[] in the Loaders, nor am
 
 The keywords are not being saved between Activity re-creations.
 
-
+There are many processes in this application with respect to creating and matching database to task to loader etc... but because of the limited amount of time there is to complete this, I will be omit building these stuctures.
 
 
