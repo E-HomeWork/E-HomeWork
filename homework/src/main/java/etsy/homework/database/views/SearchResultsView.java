@@ -13,10 +13,11 @@ import etsy.homework.providers.EtsyContentProvider;
  */
 public class SearchResultsView {
 
+    public static final String KEYWORD = "keyword";
     public static String VIEW_NAME = "searchResultsView";
     public static final String DROP = "DROP VIEW IF EXISTS " + VIEW_NAME;
     public static final String URI_PATH = VIEW_NAME;
-    public static final Uri URI = Uri.parse(EtsyContentProvider.CONTENT + EtsyContentProvider.AUTHORITY + "/" + VIEW_NAME);
+    public static final Uri URI = Uri.parse(EtsyContentProvider.SCHEMA + EtsyContentProvider.AUTHORITY + "/" + VIEW_NAME);
     public static final int CODE = 2;
     public static final String CREATE = "CREATE VIEW " + VIEW_NAME + " AS " +
         " SELECT " +

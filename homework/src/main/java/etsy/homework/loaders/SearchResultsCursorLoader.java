@@ -13,20 +13,29 @@ import etsy.homework.rest.callbacks.RestLoaderCallbacksListener;
  */
 public class SearchResultsCursorLoader extends RestLoaderCallbacks {
 
+    public static final int LOADER_ID = 0;
+    public static final String URI_PATH = SearchResultsView.URI_PATH;
     private static final Uri URI = SearchResultsView.URI;
-    private static final int LOADER_ID = 0;
+    private String mKeyword;
 
     public SearchResultsCursorLoader(Context context, LoaderManager loaderManager, RestLoaderCallbacksListener restLoaderCallbacksListener) {
         super(context, loaderManager, restLoaderCallbacksListener);
     }
 
+    public void setKeyword(final Context context, final String keyword) {
+        mKeyword = keyword;
+        onStart(context);
+    }
+
     @Override
     public Uri getUri() {
-        return URI;
+        final Uri uri = URI.buildUpon().appendQueryParameter(SearchResultsView.KEYWORD, mKeyword).build();
+        return uri;
     }
 
     @Override
     public int getLoaderId() {
         return LOADER_ID;
     }
+
 }

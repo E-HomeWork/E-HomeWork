@@ -4,22 +4,24 @@ import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import etsy.homework.Utilities.Debug;
 import etsy.homework.R;
 import etsy.homework.adapters.SearchResultsAdapter;
 import etsy.homework.database.tables.TasksTable;
-import etsy.homework.database.views.SearchResultsView;
 import etsy.homework.loaders.ResultsCursorLoader;
 import etsy.homework.loaders.SearchResultsCursorLoader;
+import etsy.homework.providers.EtsyContentProvider;
 import etsy.homework.rest.callbacks.RestLoaderCallbacksListener;
 
 
@@ -31,7 +33,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
     private ResultsCursorLoader mResultsCursorLoader;
     private SearchResultsCursorLoader mSearchResultsCursorLoader;
     private SearchResultsAdapter mSearchResultsAdapter;
-
+    private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
         final LoaderManager loaderManager = getLoaderManager();
         mResultsCursorLoader = new ResultsCursorLoader(context, loaderManager, this);
         mSearchResultsCursorLoader = new SearchResultsCursorLoader(context, loaderManager, this);
+        mURIMatcher.addURI(EtsyContentProvider.AUTHORITY, ResultsCursorLoader.URI_PATH, ResultsCursorLoader.LOADER_ID);
+        mURIMatcher.addURI(EtsyContentProvider.AUTHORITY, SearchResultsCursorLoader.URI_PATH, SearchResultsCursorLoader.LOADER_ID);
     }
 
     @Override
@@ -84,36 +88,46 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
 
     @Override
     public void onClick(final View view) {
+        final Context context = getApplicationContext();
         final String keyword = mEditText.getText().toString();
+        mSearchResultsCursorLoader.setKeyword(context, keyword);
+        mResultsCursorLoader.setKeyword(context, keyword);
     }
 
     @Override
     public void onLoadFinished(Uri uri, Cursor cursor) {
+        Debug.log("uri: " + uri + " cursor.getCount(): " + cursor.getCount());
+
         final Context context = getApplicationContext();
-        if (uri.equals(SearchResultsView.URI)) {
-            if (mSearchResultsAdapter == null) {
-                mSearchResultsAdapter = new SearchResultsAdapter(context, cursor);
-                mAdapterView.setAdapter(mSearchResultsAdapter);
-            } else {
-                mSearchResultsAdapter.swapCursor(cursor);
-            }
-        } else {
-            final boolean isCursorEmpty = cursor.getCount() == 0;
-            if (isCursorEmpty) {
-                setProgressBarIndeterminateVisibility(true);
-                return;
-            }
+        final int code = mURIMatcher.match(uri);
+        switch (code){
+            case SearchResultsCursorLoader.LOADER_ID:
+                if (mSearchResultsAdapter == null) {
+                    mSearchResultsAdapter = new SearchResultsAdapter(context, cursor);
+                    mAdapterView.setAdapter(mSearchResultsAdapter);
+                } else {
+                    mSearchResultsAdapter.swapCursor(cursor);
+                }
+                break;
+            default:
+                final boolean isCursorEmpty = cursor.getCount() == 0;
+                Debug.log("uri: " + uri + " isCursorEmpty: " + isCursorEmpty);
+                if (isCursorEmpty) {
+                    setProgressBarIndeterminateVisibility(true);
+                    return;
+                }
 
-            final int stateColumnIndex = cursor.getColumnIndex(TasksTable.Columns.STATE);
-            final String state = cursor.getString(stateColumnIndex);
+                final int stateColumnIndex = cursor.getColumnIndex(TasksTable.Columns.STATE);
+                final String state = cursor.getString(stateColumnIndex);
+                Debug.log("uri: " + uri + " state: " + state);
 
-            if (TasksTable.State.SUCCESS.equals(state)) {
-                setProgressBarIndeterminateVisibility(false);
-            } else if (TasksTable.State.FAIL.equals(state)) {
-                setProgressBarIndeterminateVisibility(false);
-            } else if (TasksTable.State.RUNNING.equals(state)) {
-                setProgressBarIndeterminateVisibility(true);
-            }
+                if (TasksTable.State.SUCCESS.equals(state)) {
+                    setProgressBarIndeterminateVisibility(false);
+                } else if (TasksTable.State.FAIL.equals(state)) {
+                    setProgressBarIndeterminateVisibility(false);
+                } else if (TasksTable.State.RUNNING.equals(state)) {
+                    setProgressBarIndeterminateVisibility(true);
+                }
         }
     }
 

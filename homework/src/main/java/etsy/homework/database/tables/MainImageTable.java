@@ -14,7 +14,7 @@ public class MainImageTable {
     public static String TABLE_NAME = "mainImage";
     public static final String DROP = "DROP TABLE IF EXISTS " + TABLE_NAME;
     public static final String URI_PATH = TABLE_NAME;
-    public static final Uri URI = Uri.parse(EtsyContentProvider.CONTENT + EtsyContentProvider.AUTHORITY + "/" + TABLE_NAME);
+    public static final Uri URI = Uri.parse(EtsyContentProvider.SCHEMA + EtsyContentProvider.AUTHORITY + "/" + TABLE_NAME);
 
     public static final String CREATE = "CREATE TABLE " + TABLE_NAME + " ( " +
             Columns.LISTING_ID + " INTEGER, " +
