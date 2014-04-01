@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="action_bar_button_search_padding">15dp</dimen>
+    <dimen name="action_bar_edit_text_search_width">300dp</dimen>
+    <dimen name="action_bar_edit_text_search_text_size">20sp</dimen>
+</resources>

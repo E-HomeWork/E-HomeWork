@@ -1,32 +1,6 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main_list_view_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="etsy.homework.activities.MainActivity">
-
-    <RelativeLayout
-        android:id="@+id/relative_layout_activity_main_search_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/activity_main_edit_text_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/activity_main_button_search" />
-
-        <Button
-            android:id="@+id/activity_main_button_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:text="@string/search" />
-    </RelativeLayout>
-
-    <ListView
-        android:id="@+id/activity_main_list_view_search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/relative_layout_activity_main_search_container" />
-</RelativeLayout>
+    android:layout_below="@+id/relative_layout_activity_main_search_container"
+    android:background="@color/activity_main_background" />
