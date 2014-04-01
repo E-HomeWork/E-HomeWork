@@ -11,8 +11,6 @@ import etsy.homework.database.tables.ResultsTable;
  */
 public class Result {
 
-    private static final String PRICE = "$ %s";
-
     @SerializedName(Keys.LISTING_ID)
     private final Long mListingId;
     @SerializedName(Keys.TITLE)
@@ -25,14 +23,17 @@ public class Result {
     private final Integer mQuantity;
     @SerializedName(Keys.MAIN_IMAGE)
     private final MainImage mMainImage;
+    @SerializedName(Keys.CURRENCY_CODE)
+    private String mCurrencyCode;
 
-    public Result(final Long listingId, final String title, final String description, final String price, final Integer quantity, final MainImage mainImage) {
+    public Result(final Long listingId, final String title, final String description, final String price, final Integer quantity, final MainImage mainImage, final String currencyCode) {
         mListingId = listingId;
         mTitle = title;
         mDescription = description;
         mPrice = price;
         mQuantity = quantity;
         mMainImage = mainImage;
+        mCurrencyCode = currencyCode;
     }
 
     public ContentValues getContentValues(){
@@ -40,9 +41,14 @@ public class Result {
         value.put(ResultsTable.Columns.LISTING_ID, getListingId());
         value.put(ResultsTable.Columns.TITLE, getTitle());
         value.put(ResultsTable.Columns.DESCRIPTION, getDescription());
-        value.put(ResultsTable.Columns.PRICE, String.format(PRICE, getPrice()));
+        value.put(ResultsTable.Columns.PRICE,  getPrice());
+        value.put(ResultsTable.Columns.CURRENCY_CODE,  getCurrencyCode());
         value.put(ResultsTable.Columns.QUANTITY, getQuantity());
         return value;
+    }
+
+    private String getCurrencyCode() {
+        return mCurrencyCode;
     }
 
     public Long getListingId() {
@@ -76,6 +82,6 @@ public class Result {
         public static final String PRICE = "price";
         public static final String QUANTITY = "quantity";
         public static final String MAIN_IMAGE = "MainImage";
-
+        public static final String CURRENCY_CODE = "currency_code";
     }
 }

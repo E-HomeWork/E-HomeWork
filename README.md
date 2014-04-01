@@ -109,3 +109,4 @@ There are many processes in this application with respect to creating and matchi
 
 ## Color scheme matches Etsy app (custom holo theme)
 
+## Added propper currency formatting including symbol

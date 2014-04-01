@@ -25,6 +25,7 @@ public class SearchResultsView {
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.DESCRIPTION + " AS " + Columns.DESCRIPTION + ", " +
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.TITLE + " AS " + Columns.TITLE + ", " +
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.PRICE + " AS " + Columns.PRICE + ", " +
+            ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.CURRENCY_CODE + " AS " + Columns.CURRENCY_CODE + ", " +
             KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.KEYWORD + " AS " + Columns.KEYWORD + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_75_X_75 + " AS " + Columns.URL_75_X_75 + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_75_X_75 + " AS " + Columns.URL_75_X_75 + ", " +
@@ -52,6 +53,7 @@ public class SearchResultsView {
         public static final String DESCRIPTION = ResultsTable.Columns.DESCRIPTION;
         public static final String TITLE = ResultsTable.Columns.TITLE;
         public static final String PRICE = ResultsTable.Columns.PRICE;
+        public static final String CURRENCY_CODE = ResultsTable.Columns.CURRENCY_CODE;
         public static final String URL_75_X_75 = MainImageTable.Columns.URL_75_X_75;
         public static final String URL_170_X_135 = MainImageTable.Columns.URL_170_X_135;
         public static final String URL_570_X_N = MainImageTable.Columns.URL_570_X_N;

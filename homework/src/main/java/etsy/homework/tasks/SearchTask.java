@@ -105,7 +105,8 @@ public class SearchTask extends RestTask {
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
 
         final ArrayList<Result> resutls = searchResponse.getResutls();
-        for (final Result result : resutls) {
+        for (int index = 0; index < resutls.size(); index++) {
+            final Result result = resutls.get(index);
 
             final Long listingId = result.getListingId();
             final String deleteResultSelection = ResultsTable.Columns.LISTING_ID + "=?";

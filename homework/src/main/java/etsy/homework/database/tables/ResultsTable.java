@@ -21,6 +21,7 @@ public class ResultsTable {
             Columns.TITLE + " varchar(255), " +
             Columns.DESCRIPTION + " varchar(255), " +
             Columns.PRICE + " varchar(255), " +
+            Columns.CURRENCY_CODE + " varchar(255), " +
             Columns.QUANTITY + " INTEGER " +
             ");";
 
@@ -30,5 +31,6 @@ public class ResultsTable {
         public static final String DESCRIPTION = Result.Keys.DESCRIPTION;
         public static final String PRICE = Result.Keys.PRICE;
         public static final String QUANTITY = Result.Keys.QUANTITY;
+        public static final String CURRENCY_CODE = Result.Keys.CURRENCY_CODE;
     }
 }
