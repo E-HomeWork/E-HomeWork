@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="etsy_orange">#d5641c</color>
-    <color name="action_bar_background">#f5f5f5</color>
-    <color name="action_bar_divider">#d7d7d4</color>
+
     <color name="activity_main_background">#efefeb</color>
     <color name="highlight">#dcdcdc</color>
     <color name="etsy_text_color">#4c4c4c</color>

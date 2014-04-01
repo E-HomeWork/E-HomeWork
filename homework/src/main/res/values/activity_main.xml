@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_main_list_view_cell_spacing">20dp</dimen>
+    <dimen name="activity_main_list_view_divider_height">@dimen/activity_main_list_view_cell_spacing</dimen>
+    <dimen name="activity_main_adapter_view_padding">@dimen/activity_main_list_view_cell_spacing</dimen>
+    <dimen name="activity_main_grid_view_cell_spacing">@dimen/activity_main_list_view_cell_spacing</dimen>
+    <dimen name="activity_main_progress_bar_margin_hack">-7dp</dimen>
+    <integer name="activity_main_grid_view_number_of_columns">2</integer>
+</resources>

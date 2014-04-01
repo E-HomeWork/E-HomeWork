@@ -2,5 +2,4 @@
 <resources>
     <string name="app_name">Etsy Homework</string>
     <string name="search">Search</string>
-    <string name="menu_activity_main_search">Search</string>
 </resources>

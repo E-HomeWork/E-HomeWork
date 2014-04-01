@@ -17,6 +17,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import etsy.homework.R;
@@ -32,6 +33,7 @@ import etsy.homework.rest.callbacks.RestLoaderCallbacksListener;
 public class MainActivity extends Activity implements View.OnClickListener, RestLoaderCallbacksListener, TextView.OnEditorActionListener {
 
     private static final String IS_SEARCH_EDIT_TEXT_VISIBLE = "isSearchEditTextVisible";
+    private static final String KEYWORD = "keyword";
     private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private AdapterView<SearchResultsAdapter> mAdapterView;
     private ResultsCursorLoader mResultsCursorLoader;
@@ -39,16 +41,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
     private SearchResultsAdapter mSearchResultsAdapter;
     private View mSearchButton;
     private EditText mSearchEditText;
+    private ProgressBar mProgressBar;
+    private String mKeyword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_main);
         super.onCreate(savedInstanceState);
 
         mAdapterView = (AdapterView<SearchResultsAdapter>) findViewById(R.id.activity_main_list_view_search);
+        mProgressBar = (ProgressBar) findViewById(R.id.activity_main_progress_bar);
 
-        initializeLoaders();
+        initializeLoaders(savedInstanceState);
         setUpActionBar(savedInstanceState);
 
     }
@@ -76,13 +80,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
         mSearchButton = null;
     }
 
-    private void initializeLoaders() {
+    private void initializeLoaders(final Bundle savedInstanceState) {
         final Context context = getApplicationContext();
         final LoaderManager loaderManager = getLoaderManager();
         mResultsCursorLoader = new ResultsCursorLoader(context, loaderManager, this);
         mSearchResultsCursorLoader = new SearchResultsCursorLoader(context, loaderManager, this);
         mURIMatcher.addURI(EtsyContentProvider.AUTHORITY, ResultsCursorLoader.URI_PATH, ResultsCursorLoader.LOADER_ID);
         mURIMatcher.addURI(EtsyContentProvider.AUTHORITY, SearchResultsCursorLoader.URI_PATH, SearchResultsCursorLoader.LOADER_ID);
+
+        if (savedInstanceState != null){
+            mKeyword = savedInstanceState.getString(KEYWORD);
+            if (mKeyword != null){
+                mSearchResultsCursorLoader.setKeyword(getApplicationContext(), mKeyword);
+            }
+        }
     }
 
     @Override
@@ -91,6 +102,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
         mAdapterView = null;
         mResultsCursorLoader = null;
         mSearchResultsCursorLoader = null;
+        mProgressBar = null;
         tearDownActionBar();
     }
 
@@ -98,6 +110,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(IS_SEARCH_EDIT_TEXT_VISIBLE, isSearchEditTextVisible());
+        outState.putString(KEYWORD, mKeyword);
     }
 
     @Override
@@ -150,7 +163,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
                 final boolean isCursorEmpty = cursor.getCount() == 0;
                 Debug.log("uri: " + uri + " isCursorEmpty: " + isCursorEmpty);
                 if (isCursorEmpty) {
-                    setProgressBarIndeterminateVisibility(true);
+                    setProgrssBarState(true);
                     return;
                 }
 
@@ -159,12 +172,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
                 Debug.log("uri: " + uri + " state: " + state);
 
                 if (TasksTable.State.SUCCESS.equals(state)) {
-                    setProgressBarIndeterminateVisibility(false);
+                    setProgrssBarState(false);
                 } else if (TasksTable.State.FAIL.equals(state)) {
-                    setProgressBarIndeterminateVisibility(false);
+                    setProgrssBarState(false);
                 } else if (TasksTable.State.RUNNING.equals(state)) {
-                    setProgressBarIndeterminateVisibility(true);
+                    setProgrssBarState(true);
                 }
+        }
+    }
+
+    private void setProgrssBarState(final boolean isVisible){
+        if (isVisible) {
+            mProgressBar.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
         }
     }
 
@@ -178,9 +199,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
     @Override
     public boolean onEditorAction(final TextView textView, final int actionId, final KeyEvent event) {
         final Context context = getApplicationContext();
-        final String keyword = textView.getText().toString();
-        mSearchResultsCursorLoader.setKeyword(context, keyword);
-        mResultsCursorLoader.setKeyword(context, keyword);
+        mKeyword = textView.getText().toString();
+        mSearchResultsCursorLoader.setKeyword(context, mKeyword);
+        mResultsCursorLoader.setKeyword(context, mKeyword);
 
         disableSearch(textView);
 

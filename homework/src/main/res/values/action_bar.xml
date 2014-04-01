@@ -3,4 +3,7 @@
     <dimen name="action_bar_button_search_padding">15dp</dimen>
     <dimen name="action_bar_edit_text_search_width">300dp</dimen>
     <dimen name="action_bar_edit_text_search_text_size">20sp</dimen>
+
+    <color name="action_bar_background">#f5f5f5</color>
+    <color name="action_bar_divider">#d7d7d4</color>
 </resources>

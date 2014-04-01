@@ -1,6 +1,17 @@
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_main_list_view_search"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below="@+id/relative_layout_activity_main_search_container"
-    android:background="@color/activity_main_background" />
+    android:background="@color/activity_main_background">
+
+    <include layout="@layout/activity_main_adapter_view" />
+
+    <ProgressBar
+        android:id="@+id/activity_main_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_main_progress_bar_margin_hack"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+
+</FrameLayout>

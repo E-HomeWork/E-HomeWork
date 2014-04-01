@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="list_item_search_result_image_view_height">400dp</dimen>
+    <dimen name="list_item_search_result_border_size">1dp</dimen>
+    <dimen name="list_item_search_result_title_padding">10dp</dimen>
+    <dimen name="list_item_search_result_text_size">15sp</dimen>
+
+    <style name="list_item_search_result_text">
+        <item name="android:textSize">@dimen/list_item_search_result_text_size</item>
+        <item name="android:padding">@dimen/list_item_search_result_title_padding</item>
+        <item name="android:fontFamily">bold</item>
+
+    </style>
+
+    <color name="list_item_search_result_background_color_1">#f1eade</color>
+    <color name="list_item_search_result_background_color_2">#aaaaaa</color>
+    <color name="list_item_search_result_background_color_3">#e6e4e5</color>
+    <color name="list_item_search_result_background_color_4">#dcd6d2</color>
+    <color name="list_item_search_result_background_color_5">#eae8dc</color>
+    <color name="list_item_search_result_background_color_6">#dbd6d7</color>
+    <color name="list_item_search_result_border">#e4e4e1</color>
+    <color name="list_item_search_result_title_background">#ffffff</color>
+    <color name="list_item_search_result_price">#6da600</color>
+
+
+</resources>

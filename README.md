@@ -103,3 +103,9 @@ The keywords are not being saved between Activity re-creations.
 There are many processes in this application with respect to creating and matching database to task to loader etc... but because of the limited amount of time there is to complete this, I will be omit building these stuctures.
 
 
+# Bonus
+
+## Designed for 10", 7" and 5" devices for both landscape and portrait
+
+## Color scheme matches Etsy app (custom holo theme)
+

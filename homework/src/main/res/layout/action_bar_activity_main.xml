@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:layout_gravity="right"
     android:gravity="right|center_vertical"
-
     android:orientation="horizontal">
 
     <EditText
@@ -15,10 +14,10 @@
         android:background="@drawable/etsytheme_edit_text_holo_light"
         android:drawableLeft="@drawable/ic_search"
         android:imeOptions="actionSearch"
-        android:singleLine="true"
         android:inputType="textNoSuggestions"
-        android:textSize="@dimen/action_bar_edit_text_search_text_size"
+        android:singleLine="true"
         android:textColor="@color/etsy_text_color"
+        android:textSize="@dimen/action_bar_edit_text_search_text_size"
         android:visibility="gone" />
 
     <ImageButton

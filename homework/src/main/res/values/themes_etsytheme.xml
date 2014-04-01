@@ -5,6 +5,13 @@
         <item name="android:editTextBackground">@drawable/etsytheme_edit_text_holo_light</item>
         <item name="android:actionBarStyle">@style/ActionBarTheme</item>
         <item name="android:textColor">@color/etsy_text_color</item>
+        <item name="android:progressBarStyle">@style/ProgressBarAppTheme</item>
+        <item name="android:windowContentOverlay">@drawable/window_content_overlay</item>
+    </style>
+
+    <style name="ProgressBarAppTheme" parent="android:Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/apptheme_progress_horizontal_holo_dark</item>
+        <item name="android:indeterminateDrawable">@drawable/apptheme_progress_indeterminate_horizontal_holo_dark</item>
     </style>
 
     <style name="ActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">

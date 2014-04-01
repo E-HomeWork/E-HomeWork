@@ -1,27 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:background="@color/list_item_search_result_border">
 
     <ImageView
         android:id="@+id/list_item_search_result_imageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="@dimen/list_item_search_result_image_view_height"
+        android:scaleType="centerCrop" />
 
-    <TextView
-        android:id="@+id/list_item_search_result_title"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/list_item_search_result_imageView"
-        android:layout_alignParentLeft="true" />
+        android:layout_marginBottom="@dimen/list_item_search_result_border_size"
+        android:layout_marginLeft="@dimen/list_item_search_result_border_size"
+        android:layout_marginRight="@dimen/list_item_search_result_border_size"
+        android:background="@color/list_item_search_result_title_background">
 
-    <TextView
-        android:id="@+id/list_item_search_result_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/list_item_search_result_imageView"
-        android:layout_toRightOf="@+id/list_item_search_result_title"
-        android:layout_alignParentRight="true"/>
+        <TextView
+            android:id="@+id/list_item_search_result_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/list_item_search_result_price"
+            android:lines="4"
+            android:padding="@dimen/list_item_search_result_title_padding"
+            android:textSize="@dimen/list_item_search_result_text_size"
+            android:textColor="@color/etsy_text_color" />
+
+        <TextView
+            android:id="@+id/list_item_search_result_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:textSize="@dimen/list_item_search_result_text_size"
+            android:padding="@dimen/list_item_search_result_title_padding"
+            android:textColor="@color/list_item_search_result_price" />
+    </RelativeLayout>
+
 </RelativeLayout>

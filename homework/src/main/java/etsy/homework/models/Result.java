@@ -11,6 +11,8 @@ import etsy.homework.database.tables.ResultsTable;
  */
 public class Result {
 
+    private static final String PRICE = "$ %s";
+
     @SerializedName(Keys.LISTING_ID)
     private final Long mListingId;
     @SerializedName(Keys.TITLE)
@@ -38,7 +40,7 @@ public class Result {
         value.put(ResultsTable.Columns.LISTING_ID, getListingId());
         value.put(ResultsTable.Columns.TITLE, getTitle());
         value.put(ResultsTable.Columns.DESCRIPTION, getDescription());
-        value.put(ResultsTable.Columns.PRICE, getPrice());
+        value.put(ResultsTable.Columns.PRICE, String.format(PRICE, getPrice()));
         value.put(ResultsTable.Columns.QUANTITY, getQuantity());
         return value;
     }
