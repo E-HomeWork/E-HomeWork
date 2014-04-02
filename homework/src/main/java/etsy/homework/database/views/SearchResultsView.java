@@ -47,8 +47,6 @@ public class SearchResultsView {
                 ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.LISTING_ID +
                     " = " +
                 KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.LISTING_ID +
-        " ORDER BY " +
-            KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.INDEX + " ASC " +
          ";";
 
     public static final class Columns {
