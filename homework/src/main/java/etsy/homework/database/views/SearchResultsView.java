@@ -28,15 +28,24 @@ public class SearchResultsView {
             " DELETE FROM " +
                 ResultsTable.TABLE_NAME +
             " WHERE " +
-                    ResultsTable.Columns.LISTING_ID +
-                " IN " +
+                    ResultsTable.Columns.LISTING_ID + " IN " +
+                        " ( " +
+                            " SELECT " +
+                                KeywordResultRelationshipTable.Columns.LISTING_ID +
+                            " FROM " +
+                                KeywordResultRelationshipTable.TABLE_NAME +
+                            " WHERE " +
+                                KeywordResultRelationshipTable.Columns.KEYWORD + "=? " +
+                        " ) " +
+                " AND " +
+                    ResultsTable.Columns.LISTING_ID + " NOT IN " +
                     " ( " +
                         " SELECT " +
                             KeywordResultRelationshipTable.Columns.LISTING_ID +
                         " FROM " +
                             KeywordResultRelationshipTable.TABLE_NAME +
                         " WHERE " +
-                            KeywordResultRelationshipTable.Columns.KEYWORD + "=? " +
+                            KeywordResultRelationshipTable.Columns.KEYWORD + "<>? " +
                     " ) " +
             " ; ";
 

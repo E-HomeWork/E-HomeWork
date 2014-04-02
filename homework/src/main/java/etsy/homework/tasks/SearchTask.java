@@ -125,11 +125,13 @@ public class SearchTask extends RestTask {
             final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
             contentProviderOperations.add(deletePaginationContentProviderOperation);
 
-            //SearchResultsView
+            // SearchResultsView
             final String deletSearchResultsSelection = SearchResultsView.Columns.KEYWORD + "=?";
             final String[] deleteSearchResultsSelectionArguments = new String[]{mKeyword};
             final ContentProviderOperation deleteSearchResultsContentProviderOperation = ContentProviderOperation.newDelete(SearchResultsView.URI).withSelection(deletSearchResultsSelection, deleteSearchResultsSelectionArguments).build();
             contentProviderOperations.add(deleteSearchResultsContentProviderOperation);
+
+            // MainImage
 
             // KeywordRelationship
             final String deleteKeywordRelationshipSelection = KeywordResultRelationshipTable.Columns.KEYWORD + "=?";
