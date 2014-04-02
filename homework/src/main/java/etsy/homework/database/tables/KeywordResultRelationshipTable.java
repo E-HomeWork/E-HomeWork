@@ -18,12 +18,14 @@ public class KeywordResultRelationshipTable {
 
     public static final String CREATE = " CREATE TABLE " + TABLE_NAME + " ( " +
             Columns.LISTING_ID + " INTEGER, " +
+            Columns.INDEX + " INTEGER, " +
             Columns.KEYWORD + " varchar(255) " +
             ");";
 
     public static final class Columns {
         public static final String LISTING_ID = KeywordResultRelationship.Keys.LISTING_ID;
         public static final String KEYWORD = KeywordResultRelationship.Keys.KEYWORD;
+        public static final String INDEX = KeywordResultRelationship.Keys.INDEX;
     }
 
 }

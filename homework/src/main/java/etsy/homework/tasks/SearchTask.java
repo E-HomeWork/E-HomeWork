@@ -134,7 +134,7 @@ public class SearchTask extends RestTask {
             contentProviderOperations.add(mainImageContentProviderOperation);
 
 
-            final KeywordResultRelationship keywordResultRelationship = new KeywordResultRelationship(listingId, mKeyword);
+            final KeywordResultRelationship keywordResultRelationship = new KeywordResultRelationship(listingId, mKeyword, index);
             final ContentValues keywordRelationshipContentValues = keywordResultRelationship.getContentValues();
             final ContentProviderOperation keywordRelationshipContentProviderOperation = ContentProviderOperation.newInsert(KeywordResultRelationshipTable.URI).withValues(keywordRelationshipContentValues).build();
             contentProviderOperations.add(keywordRelationshipContentProviderOperation);

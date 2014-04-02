@@ -16,7 +16,7 @@ import etsy.homework.database.views.SearchResultsView;
 public class EtsyDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "EtsyDatabase";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
     private static SQLiteDatabase sDatabase;
 
     public EtsyDatabase(Context context, String name) {

@@ -27,6 +27,7 @@ public class SearchResultsView {
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.PRICE + " AS " + Columns.PRICE + ", " +
             ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.CURRENCY_CODE + " AS " + Columns.CURRENCY_CODE + ", " +
             KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.KEYWORD + " AS " + Columns.KEYWORD + ", " +
+            KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.INDEX + " AS " + Columns.INDEX + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_75_X_75 + " AS " + Columns.URL_75_X_75 + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_75_X_75 + " AS " + Columns.URL_75_X_75 + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_170_X_135 + " AS " + Columns.URL_170_X_135 + ", " +
@@ -46,6 +47,8 @@ public class SearchResultsView {
                 ResultsTable.TABLE_NAME + "." + ResultsTable.Columns.LISTING_ID +
                     " = " +
                 KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.LISTING_ID +
+        " ORDER BY " +
+            KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.INDEX + " ASC " +
          ";";
 
     public static final class Columns {
@@ -59,6 +62,7 @@ public class SearchResultsView {
         public static final String URL_570_X_N = MainImageTable.Columns.URL_570_X_N;
         public static final String URL_FULL_X_FULL = MainImageTable.Columns.URL_FULL_X_FULL;
         public static final String KEYWORD = KeywordResultRelationshipTable.Columns.KEYWORD;
+        public static final String INDEX = KeywordResultRelationshipTable.Columns.INDEX;
     }
 
 }
