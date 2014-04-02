@@ -24,7 +24,7 @@ public class SearchResultsCursorLoader extends RestLoaderCallbacks {
 
     @Override
     public String getSortOrder() {
-        return SearchResultsView.Columns.INDEX;
+        return SearchResultsView.Columns.TYPE + ", " + SearchResultsView.Columns.INDEX;
     }
 
     public void setKeyword(final Context context, final String keyword) {

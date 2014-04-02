@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.RemoteException;
-import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,10 +26,12 @@ import java.util.ArrayList;
 import etsy.homework.Utilities.Debug;
 import etsy.homework.database.tables.KeywordResultRelationshipTable;
 import etsy.homework.database.tables.MainImageTable;
+import etsy.homework.database.tables.PaginationTable;
 import etsy.homework.database.tables.ResultsTable;
 import etsy.homework.database.views.SearchResultsView;
 import etsy.homework.models.KeywordResultRelationship;
 import etsy.homework.models.MainImage;
+import etsy.homework.models.Pagination;
 import etsy.homework.models.Result;
 import etsy.homework.models.SearchResponse;
 import etsy.homework.providers.EtsyContentProvider;
@@ -41,30 +42,38 @@ import etsy.homework.rest.tasks.RestTask;
  */
 public class SearchTask extends RestTask {
 
-    private static final int CONNECTION_TIMEOUT = 1000 * 3;
-    private static final int SOCKET_TIMEOUT = 1000 * 5;
-
     public static final String URI_PATH = "searchTask";
     public static final Uri URI = Uri.parse(RestTask.SCHEMA + RestTask.AUTHORITY + "/" + URI_PATH);
     public static final String KEYWORD = "keyword";
-    private static final String URL = "https://api.etsy.com/v2/listings/active?api_key=liwecjs0c3ssk6let4p1wqt9&includes=MainImage&keywords=%s";
+    public static final String PAGE = "page";
     public static final int CODE = 0;
+    public static final int FIRST_PAGE = 1;
+    private static final int CONNECTION_TIMEOUT = 1000 * 3;
+    private static final int SOCKET_TIMEOUT = 1000 * 5;
+    private static final String URL = "https://api.etsy.com/v2/listings/active?api_key=liwecjs0c3ssk6let4p1wqt9&includes=MainImage&keywords=%s&page=%d";
     private final String mKeyword;
+    private final int mPage;
 
     public SearchTask(Context context, Uri uri) {
         super(context, uri);
         mKeyword = uri.getQueryParameter(KEYWORD);
+        final String pageString = uri.getQueryParameter(PAGE);
+        if (pageString == null || pageString.isEmpty()) {
+            mPage = FIRST_PAGE;
+        } else {
+            mPage = Integer.parseInt(pageString);
+        }
     }
 
     @Override
     public void executeTask() throws Exception {
         Debug.log("mKeyword: " + mKeyword);
 
-        if (mKeyword == null || mKeyword.isEmpty()){
+        if (mKeyword == null || mKeyword.isEmpty()) {
             return;
         }
 
-        final String url = String.format(URL, mKeyword);
+        final String url = String.format(URL, mKeyword, mPage);
         final HttpGet httpget = new HttpGet(url);
         final HttpParams httpParameters = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParameters, CONNECTION_TIMEOUT);
@@ -104,37 +113,71 @@ public class SearchTask extends RestTask {
     private void writeToDatabase(final SearchResponse searchResponse) throws RemoteException, OperationApplicationException {
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
 
+
+        final Pagination pagination = searchResponse.getPagination();
+        pagination.setKeyword(mKeyword);
+        final int effectiveOffset = pagination.getEffectiveOffset();
+        final boolean isFirstPage = mPage == FIRST_PAGE;
+        if (isFirstPage) {
+            // Pagination
+            final String deletePaginationSelection = PaginationTable.Columns.KEYWORD + "=?";
+            final String[] deletePaginationSelectionArguments = new String[]{mKeyword};
+            final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
+            contentProviderOperations.add(deletePaginationContentProviderOperation);
+
+            //SearchResultsView
+            final String deletSearchResultsSelection = SearchResultsView.Columns.KEYWORD + "=?";
+            final String[] deleteSearchResultsSelectionArguments = new String[]{mKeyword};
+            final ContentProviderOperation deleteSearchResultsContentProviderOperation = ContentProviderOperation.newDelete(SearchResultsView.URI).withSelection(deletSearchResultsSelection, deleteSearchResultsSelectionArguments).build();
+            contentProviderOperations.add(deleteSearchResultsContentProviderOperation);
+
+            // KeywordRelationship
+            final String deleteKeywordRelationshipSelection = KeywordResultRelationshipTable.Columns.KEYWORD + "=?";
+            final String[] deleteKeywordRelationshipSelectionArguments = new String[]{mKeyword};
+            final ContentProviderOperation deleteKeywordRelationshipContentProviderOperation = ContentProviderOperation.newDelete(KeywordResultRelationshipTable.URI).withSelection(deleteKeywordRelationshipSelection, deleteKeywordRelationshipSelectionArguments).build();
+            contentProviderOperations.add(deleteKeywordRelationshipContentProviderOperation);
+        }
+
+        // Pagination
+        final ContentValues paginationContentValues = pagination.getContentValues();
+        final ContentProviderOperation paginationContentProviderOperation = ContentProviderOperation.newInsert(PaginationTable.URI).withValues(paginationContentValues).build();
+        contentProviderOperations.add(paginationContentProviderOperation);
+
         final ArrayList<Result> resutls = searchResponse.getResutls();
         for (int index = 0; index < resutls.size(); index++) {
+
             final Result result = resutls.get(index);
 
+            // Reults
             final Long listingId = result.getListingId();
             final String deleteResultSelection = ResultsTable.Columns.LISTING_ID + "=?";
             final String[] deleteResultSelectionArguments = new String[]{Long.toString(listingId)};
             final ContentProviderOperation deleteResultContentProviderOperation = ContentProviderOperation.newDelete(ResultsTable.URI).withSelection(deleteResultSelection, deleteResultSelectionArguments).build();
             contentProviderOperations.add(deleteResultContentProviderOperation);
 
+            final ContentValues resultContentValues = result.getContentValues();
+            final ContentProviderOperation resultContentProviderOperation = ContentProviderOperation.newInsert(ResultsTable.URI).withValues(resultContentValues).build();
+            contentProviderOperations.add(resultContentProviderOperation);
+
+            // Main Image
             final String deleteMainImageSelection = MainImageTable.Columns.LISTING_ID + "=?";
             final String[] deleteMainImageSelectionArguments = new String[]{Long.toString(listingId)};
             final ContentProviderOperation deleteMainImageContentProviderOperation = ContentProviderOperation.newDelete(MainImageTable.URI).withSelection(deleteMainImageSelection, deleteMainImageSelectionArguments).build();
             contentProviderOperations.add(deleteMainImageContentProviderOperation);
-
-            final String deleteKeywordRelationshipSelection = KeywordResultRelationshipTable.Columns.LISTING_ID + "=? AND " + KeywordResultRelationshipTable.Columns.KEYWORD + "=?";
-            final String[] deleteKeywordRelationshipSelectionArguments = new String[]{Long.toString(listingId), mKeyword};
-            final ContentProviderOperation deleteKeywordRelationshipContentProviderOperation = ContentProviderOperation.newDelete(KeywordResultRelationshipTable.URI).withSelection(deleteKeywordRelationshipSelection, deleteKeywordRelationshipSelectionArguments).build();
-            contentProviderOperations.add(deleteKeywordRelationshipContentProviderOperation);
-
-            final ContentValues resutContentValues = result.getContentValues();
-            final ContentProviderOperation resultContentProviderOperation = ContentProviderOperation.newInsert(ResultsTable.URI).withValues(resutContentValues).build();
-            contentProviderOperations.add(resultContentProviderOperation);
 
             final MainImage mainImage = result.getMainImage();
             final ContentValues mainImageContentValues = mainImage.getContentValues();
             final ContentProviderOperation mainImageContentProviderOperation = ContentProviderOperation.newInsert(MainImageTable.URI).withValues(mainImageContentValues).build();
             contentProviderOperations.add(mainImageContentProviderOperation);
 
+            // Keyword Relationship
+            final String deleteKeywordRelationshipSelection = KeywordResultRelationshipTable.Columns.LISTING_ID + "=? AND " + KeywordResultRelationshipTable.Columns.KEYWORD + "=?";
+            final String[] deleteKeywordRelationshipSelectionArguments = new String[]{Long.toString(listingId), mKeyword};
+            final ContentProviderOperation deleteKeywordRelationshipContentProviderOperation = ContentProviderOperation.newDelete(KeywordResultRelationshipTable.URI).withSelection(deleteKeywordRelationshipSelection, deleteKeywordRelationshipSelectionArguments).build();
+            contentProviderOperations.add(deleteKeywordRelationshipContentProviderOperation);
 
-            final KeywordResultRelationship keywordResultRelationship = new KeywordResultRelationship(listingId, mKeyword, index);
+            final int keywordIndex = index + effectiveOffset;
+            final KeywordResultRelationship keywordResultRelationship = new KeywordResultRelationship(listingId, mKeyword, keywordIndex);
             final ContentValues keywordRelationshipContentValues = keywordResultRelationship.getContentValues();
             final ContentProviderOperation keywordRelationshipContentProviderOperation = ContentProviderOperation.newInsert(KeywordResultRelationshipTable.URI).withValues(keywordRelationshipContentValues).build();
             contentProviderOperations.add(keywordRelationshipContentProviderOperation);
@@ -146,4 +189,5 @@ public class SearchTask extends RestTask {
     }
 
 }
+
 

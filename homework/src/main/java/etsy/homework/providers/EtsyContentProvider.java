@@ -20,6 +20,7 @@ import etsy.homework.Utilities.Debug;
 import etsy.homework.database.EtsyDatabase;
 import etsy.homework.database.tables.KeywordResultRelationshipTable;
 import etsy.homework.database.tables.MainImageTable;
+import etsy.homework.database.tables.PaginationTable;
 import etsy.homework.database.tables.ResultsTable;
 import etsy.homework.database.tables.TasksTable;
 import etsy.homework.database.views.SearchResultsView;
@@ -51,6 +52,8 @@ public class EtsyContentProvider extends ContentProvider {
                 return KeywordResultRelationshipTable.TABLE_NAME;
             case SearchResultsView.CODE:
                 return SearchResultsView.VIEW_NAME;
+            case PaginationTable.CODE:
+                return PaginationTable.TABLE_NAME;
         }
         return null;
     }
@@ -62,6 +65,7 @@ public class EtsyContentProvider extends ContentProvider {
         mURIMatcher.addURI(AUTHORITY, MainImageTable.URI_PATH, MainImageTable.CODE);
         mURIMatcher.addURI(AUTHORITY, KeywordResultRelationshipTable.URI_PATH, KeywordResultRelationshipTable.CODE);
         mURIMatcher.addURI(AUTHORITY, SearchResultsView.URI_PATH, SearchResultsView.CODE);
+        mURIMatcher.addURI(AUTHORITY, PaginationTable.URI_PATH, PaginationTable.CODE);
         return true;
     }
 
@@ -71,7 +75,6 @@ public class EtsyContentProvider extends ContentProvider {
         final Context context = getContext();
         final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
         final String tableName = getTableName(uri);
-        Cursor cursor = null;
 
         final int match = mURIMatcher.match(uri);
         switch (match) {
@@ -79,24 +82,20 @@ public class EtsyContentProvider extends ContentProvider {
                 final String uriString = uri.getQueryParameter(RestTask.TASK_URI);
                 final String whereClause = TasksTable.Columns.TASK_ID + "=?";
                 final String[] whereArguments = new String[]{uriString};
-                cursor = sqLiteDatabase.query(tableName, projection, whereClause, whereArguments, sortOrder, null, null);
-                break;
+                final Cursor cursor = sqLiteDatabase.query(tableName, projection, whereClause, whereArguments, sortOrder, null, null);
+                launchTask(uri, cursor);
+                return cursor;
             }
             case SearchResultsView.CODE: {
                 final String keyword = uri.getQueryParameter(SearchResultsView.KEYWORD);
                 final String whereClause = SearchResultsView.Columns.KEYWORD + "=?";
                 final String[] whereArguments = new String[]{keyword};
-                cursor = sqLiteDatabase.query(tableName, projection, whereClause, whereArguments, sortOrder, null, null);
-                break;
+                return sqLiteDatabase.query(tableName, projection, whereClause, whereArguments, sortOrder, null, null);
             }
             default:
                 Debug.log("default");
-                cursor = sqLiteDatabase.query(tableName, projection, selection, selectionArgs, sortOrder, null, null);
+                return sqLiteDatabase.query(tableName, projection, selection, selectionArgs, sortOrder, null, null);
         }
-
-        launchTask(uri, cursor);
-
-        return cursor;
     }
 
     @Override
@@ -111,6 +110,7 @@ public class EtsyContentProvider extends ContentProvider {
         final Context context = getContext();
         final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
         final String tableName = getTableName(uri);
+
         final long id = sqLiteDatabase.insert(tableName, null, values);
         return ContentUris.withAppendedId(uri, id);
     }
@@ -119,9 +119,17 @@ public class EtsyContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         final Context context = getContext();
         final SQLiteDatabase sqLiteDatabase = EtsyDatabase.getDatabase(context);
-        final String tableName = getTableName(uri);
-        final int numRowsDeleted = sqLiteDatabase.delete(tableName, selection, selectionArgs);
-        return numRowsDeleted;
+
+        final int match = mURIMatcher.match(uri);
+        switch (match) {
+            case SearchResultsView.CODE:
+                sqLiteDatabase.rawQuery(SearchResultsView.DELETE_KEYWORD_MATCH, selectionArgs);
+                return 0;
+            default:
+                final String tableName = getTableName(uri);
+                final int numRowsDeleted = sqLiteDatabase.delete(tableName, selection, selectionArgs);
+                return numRowsDeleted;
+        }
     }
 
     @Override

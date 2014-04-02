@@ -14,6 +14,7 @@ import java.util.Currency;
 import java.util.Locale;
 
 import etsy.homework.R;
+import etsy.homework.listeners.PaginationListener;
 
 /**
  * Created by emir on 01/04/14.
@@ -79,5 +80,16 @@ public class SearchResultBindings {
             default:
                 return R.color.list_item_search_result_background_color_6;
         }
+    }
+
+    public static void bindPagination(final Context context, final PaginationListener mPaginationListener, final Cursor cursor, final String columnName) {
+        if (mPaginationListener == null){
+            return;
+        }
+        final int columnIndex = cursor.getColumnIndex(columnName);
+        final int nextPage = cursor.getInt(columnIndex);
+
+        mPaginationListener.paginate(context, nextPage);
+
     }
 }

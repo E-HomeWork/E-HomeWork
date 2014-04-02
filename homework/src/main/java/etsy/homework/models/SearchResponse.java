@@ -50,7 +50,7 @@ public class SearchResponse {
         public static final String RESULTS = "results";
         public static final String PARAMS = "params";
         public static final String TYPE = "type";
-        public static final String PAGINATION = "Pagination";
+        public static final String PAGINATION = "pagination";
     }
 
 }

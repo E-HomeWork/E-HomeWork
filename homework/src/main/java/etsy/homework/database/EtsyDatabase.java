@@ -6,9 +6,12 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import etsy.homework.database.tables.KeywordResultRelationshipTable;
 import etsy.homework.database.tables.MainImageTable;
+import etsy.homework.database.tables.PaginationTable;
 import etsy.homework.database.tables.ResultsTable;
 import etsy.homework.database.tables.TasksTable;
+import etsy.homework.database.views.PaginationView;
 import etsy.homework.database.views.SearchResultsView;
+import etsy.homework.models.Pagination;
 
 /**
  * Created by emir on 28/03/14.
@@ -16,7 +19,7 @@ import etsy.homework.database.views.SearchResultsView;
 public class EtsyDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "EtsyDatabase";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 8;
     private static SQLiteDatabase sDatabase;
 
     public EtsyDatabase(Context context, String name) {
@@ -41,6 +44,12 @@ public class EtsyDatabase extends SQLiteOpenHelper {
 
         db.execSQL(MainImageTable.DROP);
         db.execSQL(MainImageTable.CREATE);
+
+        db.execSQL(PaginationTable.DROP);
+        db.execSQL(PaginationTable.CREATE);
+
+        db.execSQL(PaginationView.DROP);
+        db.execSQL(PaginationView.CREATE);
 
         db.execSQL(KeywordResultRelationshipTable.DROP);
         db.execSQL(KeywordResultRelationshipTable.CREATE);
