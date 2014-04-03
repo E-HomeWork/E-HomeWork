@@ -69,7 +69,8 @@ public class SearchTask extends RestTask {
     }
 
 
-    private void runPreTaskOperations() throws RemoteException, OperationApplicationException {
+    // This methos is a bit of a hack to ensure that the ListView/GridView refresh in such a way that the user is taken back to the first element and therefore thinks it is a fresh list
+    private void cleanUpData() throws RemoteException, OperationApplicationException {
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
 
         // Pagination
@@ -120,6 +121,20 @@ public class SearchTask extends RestTask {
     }
 
 
+    private void runPreTaskOperations(){
+        final Pagination pagination = new Pagination(mPage, 0);
+        pagination.setKeyword(mKeyword);
+        pagination.setState(Pagination.State.active);
+        final ContentValues updatePaginationContentValues = pagination.getContentValues();
+
+        final String updatePaginationSelection = PaginationTable.Columns.KEYWORD + "=? AND " + PaginationTable.Columns.NEXT_PAGE + "=?";
+        final String[] updatePaginationSelectionArguments = new String[]{mKeyword, Integer.toString(mPage)};
+        final Context context = getContext();
+        final ContentResolver contentResolver = context.getContentResolver();
+        contentResolver.update(PaginationTable.URI, updatePaginationContentValues, updatePaginationSelection, updatePaginationSelectionArguments);
+        contentResolver.notifyChange(SearchResultsView.URI, null);
+
+    }
     @Override
     public void executeTask() throws Exception {
 
@@ -154,9 +169,13 @@ public class SearchTask extends RestTask {
                 inputStream = entity.getContent();
                 inputStreamReader = new InputStreamReader(inputStream);
                 final SearchResponse searchResponse = GSON.fromJson(inputStreamReader, SearchResponse.class);
+
+                try {
+                    cleanUpData();
+                } catch (final Exception exception) {
+                }
+
                 writeToDatabase(searchResponse);
-
-
             } finally {
                 if (inputStreamReader != null) {
                     try {

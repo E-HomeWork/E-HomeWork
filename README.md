@@ -1,10 +1,6 @@
-#WORK IS STILL IN PROGRESS!!
-
-Below I document some of the thought processes that go into each iteration of this applicaiton. When the application is complete, I will remove the "WORK IN PROGRESS!!" banner.
-
 # Etsy HomeWork
 
-The following will explain the choices made throughout the application, please feel free to follow up on any questions you may have.
+The following will explain the choices made throughout the application, please feel free to follow up on any questions you may have. You can find a list of the bonuses at the bottom.
 
 # Data flow
 
@@ -105,8 +101,42 @@ There are many processes in this application with respect to creating and matchi
 
 # Bonus
 
+## Pagination
+
+Pagination has a lot of flows, I'll enumerate the main flows and hope that I've thought of all of them.
+
+1. Initial Load, The user hasn't loaded any data before we load the data and have the end element represent the pagination.
+
+2. When we reach the pagination tile, the network request runs in the background.
+
+3. If it is successful, we add a new pagination tile at the end and repeat 2 and 3 until there are no more paginations left.
+
+4. If it was not successful, we stop animating the pagination tile and show a message that asks you to click on the pagination tile to retry.
+
+5. If you click on the pagination tile, then you go back to step 2.
+
+6. If you re-search the term you are pagination through, all of your results get deleted and you go back to step 1.
+
+ISSUES:
+
+The only issue I can think of is that if you are running a pagination call and simultaneously trigger a new search for the same keyword as the pagination call, then the data that comes back will potentially be invalid.
+
 ## Designed for 10", 7" and 5" devices for both landscape and portrait
+
+10" has a gridView layout with 3 columns on landscape and 2 on portrait
+
+7" and 5" have ListViews on portrait and a 2 column GridView on Landscape. The sizes for both on landscape are different so to fit the screen format.
 
 ## Color scheme matches Etsy app (custom holo theme)
 
+Note the nice highlight states for the List Items
+
 ## Added propper currency formatting including symbol
+
+I figure the symbol out based on the incoming curency code
+
+## Full Offline Support
+
+The application should work as long as it has previously cached data. This means that if you search 'Music' while online and you page down 40 pages worth of content. That content should be available as you last saw it.
+
+
