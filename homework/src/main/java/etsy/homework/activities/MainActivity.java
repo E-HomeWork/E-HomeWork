@@ -33,6 +33,7 @@ import etsy.homework.loaders.SearchTaskCursorLoader;
 import etsy.homework.loaders.SearchResultsCursorLoader;
 import etsy.homework.providers.EtsyContentProvider;
 import etsy.homework.rest.callbacks.RestLoaderCallbacksListener;
+import etsy.homework.services.EtsyService;
 
 
 public class MainActivity extends Activity implements View.OnClickListener, RestLoaderCallbacksListener, TextView.OnEditorActionListener, AdapterView.OnItemClickListener, PaginationListener {
@@ -260,7 +261,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
             case pagination:
                 final int nextPageColumnIndex = cursor.getColumnIndex(SearchResultsView.Columns.NEXT_PAGE);
                 final int nextPage = cursor.getInt(nextPageColumnIndex);
-                Crouton.showText(this, "Next Page: " + nextPage, Style.ALERT);
+                EtsyService.startTask(getApplicationContext(), mSearchTaskCursorLoader.getInnerUri());
                 break;
             case item:
         }

@@ -5,7 +5,9 @@ import android.provider.BaseColumns;
 
 import etsy.homework.database.tables.KeywordResultRelationshipTable;
 import etsy.homework.database.tables.MainImageTable;
+import etsy.homework.database.tables.PaginationTable;
 import etsy.homework.database.tables.ResultsTable;
+import etsy.homework.models.Pagination;
 import etsy.homework.providers.EtsyContentProvider;
 
 /**
@@ -65,6 +67,7 @@ public class SearchResultsView {
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_570_X_N + " AS " + Columns.URL_570_X_N + ", " +
             MainImageTable.TABLE_NAME + "." + MainImageTable.Columns.URL_FULL_X_FULL + " AS " + Columns.URL_FULL_X_FULL + ", " +
             "'" + SearchResultsViewType.item.ordinal() + "'" + " AS " + Columns.TYPE + ", " +
+            " NULL AS " + Columns.PAGINATION_STATE + ", " +
             " NULL AS " + Columns.NEXT_PAGE + " " +
         " FROM " +
                 ResultsTable.TABLE_NAME +
@@ -95,6 +98,7 @@ public class SearchResultsView {
                 " NULL AS " + Columns.URL_570_X_N + ", " +
                 " NULL AS " + Columns.URL_FULL_X_FULL + ", " +
                 "'" + SearchResultsViewType.pagination.ordinal() + "'" + " AS " + Columns.TYPE + ", " +
+                PaginationView.VIEW_NAME + "." + PaginationView.Columns.STATE + " AS " + Columns.PAGINATION_STATE + ", " +
                 PaginationView.VIEW_NAME + "." + PaginationView.Columns.NEXT_PAGE + " AS " + Columns.NEXT_PAGE + " " +
             " FROM " +
                 PaginationView.VIEW_NAME +
@@ -118,6 +122,7 @@ public class SearchResultsView {
         public static final String INDEX = KeywordResultRelationshipTable.Columns.INDEX;
         public static final String NEXT_PAGE = PaginationView.Columns.NEXT_PAGE;
         public static final String TYPE = "type";
+        public static final String PAGINATION_STATE = PaginationTable.Columns.STATE;
     }
 
 }

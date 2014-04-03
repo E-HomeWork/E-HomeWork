@@ -40,7 +40,10 @@ public abstract class RestTask implements Runnable {
     @Override
     public void run() {
         try {
-            notifyRunning();
+            final boolean isRunning = notifyRunning();
+            if (!isRunning){
+                return;
+            }
             executeTask();
             onSuccess();
         } catch (final Exception exception) {
@@ -48,7 +51,7 @@ public abstract class RestTask implements Runnable {
         }
     }
 
-    private void notifyRunning() {
+    private boolean notifyRunning() {
 
         final String whereClause = TasksTable.Columns.TASK_ID + "=? AND " + TasksTable.Columns.STATE + "<>?";
         final String[] whereArguments = new String[]{mTaskId.toString(), TasksTable.State.RUNNING};
@@ -68,8 +71,9 @@ public abstract class RestTask implements Runnable {
                 final String[] queryWhereArguments = new String[]{mTaskId.toString(), TasksTable.State.RUNNING};
                 final Cursor cursor = sqLiteDatabase.query(TasksTable.TABLE_NAME, null, queryWhereClause, queryWhereArguments, null, null, null);
                 try {
-                    if (cursor.getCount() != 0)
-                        return;
+                    if (cursor.getCount() != 0) {
+                        return false;
+                    }
                 } finally {
                     cursor.close();
                 }
@@ -82,6 +86,8 @@ public abstract class RestTask implements Runnable {
 
         final ContentResolver contentResolver = getContext().getContentResolver();
         contentResolver.notifyChange(TasksTable.URI, null);
+
+        return true;
     }
 
     private void onFailure() {

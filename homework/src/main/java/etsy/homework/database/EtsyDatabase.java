@@ -19,7 +19,7 @@ import etsy.homework.models.Pagination;
 public class EtsyDatabase extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "EtsyDatabase";
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 16;
     private static SQLiteDatabase sDatabase;
 
     public EtsyDatabase(Context context, String name) {

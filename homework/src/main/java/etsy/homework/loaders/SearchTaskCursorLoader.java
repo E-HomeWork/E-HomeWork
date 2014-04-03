@@ -33,7 +33,7 @@ public class SearchTaskCursorLoader extends RestLoaderCallbacks {
         return URI.buildUpon().appendQueryParameter(RestTask.TASK_URI, innerUri.toString()).build();
     }
 
-    private Uri getInnerUri() {
+    public Uri getInnerUri() {
         if (mKeyword == null || mKeyword.isEmpty()) {
             return SearchTask.URI;
         }

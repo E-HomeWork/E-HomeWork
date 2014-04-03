@@ -63,7 +63,7 @@ public class SearchResultsAdapter extends CursorAdapter {
         final LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final SearchResultsViewType searchResultsViewType = getSearchResultsViewType(cursor);
         switch (searchResultsViewType){
-            case item:
+            case item: {
                 final View view = layoutInflater.inflate(R.layout.list_item_search_result_item, parent, false);
 
                 optimize(view, R.id.list_item_search_result_title);
@@ -71,8 +71,15 @@ public class SearchResultsAdapter extends CursorAdapter {
                 optimize(view, R.id.list_item_search_result_imageView);
 
                 return view;
-            case pagination:
-                return layoutInflater.inflate(R.layout.list_item_search_result_pagination, parent, false);
+            }
+            case pagination: {
+                final View view = layoutInflater.inflate(R.layout.list_item_search_result_pagination, parent, false);
+
+                optimize(view, R.id.list_item_search_result_pagination_message);
+                optimize(view, R.id.list_item_search_result_pagination_progress_bar);
+
+                return view;
+            }
         }
 
         return null;
@@ -122,6 +129,8 @@ public class SearchResultsAdapter extends CursorAdapter {
                 break;
             case pagination:
                 SearchResultBindings.bindPagination(context, mPaginationListener, cursor, SearchResultsView.Columns.NEXT_PAGE);
+                SearchResultBindings.bindPaginationMessage(view, R.id.list_item_search_result_pagination_message, cursor, SearchResultsView.Columns.PAGINATION_STATE);
+                SearchResultBindings.bindPaginationProgressBar(view, R.id.list_item_search_result_pagination_progress_bar, cursor, SearchResultsView.Columns.PAGINATION_STATE);
         }
 
     }

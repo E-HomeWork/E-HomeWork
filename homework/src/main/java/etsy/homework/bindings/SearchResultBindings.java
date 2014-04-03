@@ -6,6 +6,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -15,6 +16,7 @@ import java.util.Locale;
 
 import etsy.homework.R;
 import etsy.homework.listeners.PaginationListener;
+import etsy.homework.models.Pagination;
 
 /**
  * Created by emir on 01/04/14.
@@ -90,6 +92,32 @@ public class SearchResultBindings {
         final int nextPage = cursor.getInt(columnIndex);
 
         mPaginationListener.paginate(context, nextPage);
+
+    }
+
+    public static void bindPaginationMessage(final View view, final int resourceId, final Cursor cursor, final String columnName) {
+        final int columnIndex = cursor.getColumnIndex(columnName);
+        final int ordinal = cursor.getInt(columnIndex);
+        final Pagination.State state = Pagination.State.values()[ordinal];
+        final TextView textView = (TextView) view.getTag(resourceId);
+        if (state.equals(Pagination.State.active)) {
+            textView.setVisibility(View.GONE);
+        } else {
+            textView.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    public static void bindPaginationProgressBar(final View view, final int resourceId, final Cursor cursor, final String columnName) {
+        final int columnIndex = cursor.getColumnIndex(columnName);
+        final int ordinal = cursor.getInt(columnIndex);
+        final Pagination.State state = Pagination.State.values()[ordinal];
+        final ProgressBar progressBar = (ProgressBar) view.getTag(resourceId);
+        if (state.equals(Pagination.State.inactive)) {
+            progressBar.setVisibility(View.GONE);
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
 
     }
 }

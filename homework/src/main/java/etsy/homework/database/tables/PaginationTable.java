@@ -19,11 +19,13 @@ public class PaginationTable {
 
     public static final String CREATE = "CREATE TABLE " + TABLE_NAME + " ( " +
             Columns.NEXT_PAGE + " INTEGER, " +
+            Columns.STATE + " INTEGER, " +
             Columns.KEYWORD + " varchar(255) " +
             ");";
 
     public static final class Columns {
         public static final String KEYWORD = Pagination.Keys.KEYWORD;
         public static final String NEXT_PAGE = Pagination.Keys.NEXT_PAGE;
+        public static final String STATE = Pagination.Keys.STATE;
     }
 }

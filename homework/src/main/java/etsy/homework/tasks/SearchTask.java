@@ -6,7 +6,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.RemoteException;
 
@@ -26,7 +25,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import etsy.homework.Utilities.Debug;
-import etsy.homework.database.EtsyDatabase;
 import etsy.homework.database.tables.KeywordResultRelationshipTable;
 import etsy.homework.database.tables.MainImageTable;
 import etsy.homework.database.tables.PaginationTable;
@@ -71,8 +69,19 @@ public class SearchTask extends RestTask {
     }
 
 
-    private void runFirstPageDeleteOperations() throws RemoteException, OperationApplicationException {
+    private void runPreTaskOperations() throws RemoteException, OperationApplicationException {
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
+
+        // Pagination
+        final Pagination pagination = new Pagination(mPage, 0);
+        pagination.setKeyword(mKeyword);
+        pagination.setState(Pagination.State.active);
+        final ContentValues updatePaginationContentValues = pagination.getContentValues();
+        final String updatePaginationSelection = PaginationTable.Columns.KEYWORD + "=? AND " + PaginationTable.Columns.NEXT_PAGE + "=?";
+        final String[] updatePaginationSelectionArguments = new String[]{mKeyword, Integer.toString(mPage)};
+        final ContentProviderOperation updatePaginationContenProviderOperation = ContentProviderOperation.newUpdate(PaginationTable.URI).withSelection(updatePaginationSelection, updatePaginationSelectionArguments).withValues(updatePaginationContentValues).build();
+        contentProviderOperations.add(updatePaginationContenProviderOperation);
+
         final boolean isFirstPage = mPage == FIRST_PAGE;
         if (isFirstPage) {
 
@@ -102,65 +111,93 @@ public class SearchTask extends RestTask {
             final String[] deletePaginationSelectionArguments = new String[]{mKeyword};
             final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
             contentProviderOperations.add(deletePaginationContentProviderOperation);
-
-            final ContentResolver contentResolver = getContext().getContentResolver();
-            final ContentProviderResult[] contentProviderResults = contentResolver.applyBatch(EtsyContentProvider.AUTHORITY, contentProviderOperations);
-            contentResolver.notifyChange(SearchResultsView.URI, null);
-            contentProviderOperations.clear();
         }
+
+        final Context context = getContext();
+        final ContentResolver contentResolver = context.getContentResolver();
+        final ContentProviderResult[] contentProviderResults = contentResolver.applyBatch(EtsyContentProvider.AUTHORITY, contentProviderOperations);
+        contentResolver.notifyChange(SearchResultsView.URI, null);
     }
+
+
     @Override
     public void executeTask() throws Exception {
+
         Debug.log("mKeyword: " + mKeyword);
         if (mKeyword == null || mKeyword.isEmpty()) {
             return;
         }
-        runFirstPageDeleteOperations();
 
-        final String encodedKeyword = URLEncoder.encode(mKeyword, UTF8);
-        final String url = String.format(URL, encodedKeyword, mPage);
-        final HttpGet httpget = new HttpGet(url);
-        final HttpParams httpParameters = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParameters, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setSoTimeout(httpParameters, SOCKET_TIMEOUT);
-        final HttpClient httpclient = new DefaultHttpClient(httpParameters);
-
-        Debug.log("url: " + url);
-
-
-        InputStream inputStream = null;
-        InputStreamReader inputStreamReader = null;
         try {
-            final HttpResponse response = httpclient.execute(httpget);
-            final HttpEntity entity = response.getEntity();
-
-            inputStream = entity.getContent();
-            inputStreamReader = new InputStreamReader(inputStream);
-            final SearchResponse searchResponse = GSON.fromJson(inputStreamReader, SearchResponse.class);
-            writeToDatabase(searchResponse);
-
-        } finally {
-            if (inputStreamReader != null) {
-                try {
-                    inputStreamReader.close();
-                } catch (final IOException ioException) {
-                }
-            }
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (final IOException ioException) {
-                }
-            }
+            runPreTaskOperations();
+        } catch (final Exception exception) {
         }
+
+        try {
+            final String encodedKeyword = URLEncoder.encode(mKeyword, UTF8);
+            final String url = String.format(URL, encodedKeyword, mPage);
+            final HttpGet httpget = new HttpGet(url);
+            final HttpParams httpParameters = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, CONNECTION_TIMEOUT);
+            HttpConnectionParams.setSoTimeout(httpParameters, SOCKET_TIMEOUT);
+            final HttpClient httpclient = new DefaultHttpClient(httpParameters);
+
+            Debug.log("url: " + url);
+
+
+            InputStream inputStream = null;
+            InputStreamReader inputStreamReader = null;
+            try {
+                final HttpResponse response = httpclient.execute(httpget);
+                final HttpEntity entity = response.getEntity();
+
+                inputStream = entity.getContent();
+                inputStreamReader = new InputStreamReader(inputStream);
+                final SearchResponse searchResponse = GSON.fromJson(inputStreamReader, SearchResponse.class);
+                writeToDatabase(searchResponse);
+
+
+            } finally {
+                if (inputStreamReader != null) {
+                    try {
+                        inputStreamReader.close();
+                    } catch (final IOException ioException) {
+                    }
+                }
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (final IOException ioException) {
+                    }
+                }
+
+            }
+        }catch (final Exception exception){
+            runPostTaskOperations();
+            throw exception;
+        }
+    }
+
+    private void runPostTaskOperations() {
+        final Pagination pagination = new Pagination(mPage, 0);
+        pagination.setKeyword(mKeyword);
+        pagination.setState(Pagination.State.inactive);
+        final ContentValues updatePaginationContentValues = pagination.getContentValues();
+
+        final String updatePaginationSelection = PaginationTable.Columns.KEYWORD + "=? AND " + PaginationTable.Columns.NEXT_PAGE + "=?";
+        final String[] updatePaginationSelectionArguments = new String[]{mKeyword, Integer.toString(mPage)};
+        final Context context = getContext();
+        final ContentResolver contentResolver = context.getContentResolver();
+        contentResolver.update(PaginationTable.URI, updatePaginationContentValues, updatePaginationSelection, updatePaginationSelectionArguments);
+        contentResolver.notifyChange(SearchResultsView.URI, null);
     }
 
     private void writeToDatabase(final SearchResponse searchResponse) throws RemoteException, OperationApplicationException {
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
 
         final Pagination pagination = searchResponse.getPagination();
+        final int effectiveOffset = pagination.getEffectiveOffset();
         pagination.setKeyword(mKeyword);
-
 
         // Pagination
         final String deletePaginationSelection = PaginationTable.Columns.KEYWORD + "=?";
@@ -168,16 +205,12 @@ public class SearchTask extends RestTask {
         final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
         contentProviderOperations.add(deletePaginationContentProviderOperation);
 
-        final int effectiveOffset = pagination.getEffectiveOffset();
-
-
         final ContentValues paginationContentValues = pagination.getContentValues();
         final ContentProviderOperation paginationContentProviderOperation = ContentProviderOperation.newInsert(PaginationTable.URI).withValues(paginationContentValues).build();
         contentProviderOperations.add(paginationContentProviderOperation);
 
         final ArrayList<Result> resutls = searchResponse.getResutls();
         for (int index = 0; index < resutls.size(); index++) {
-
             final Result result = resutls.get(index);
 
             // Reults
@@ -215,7 +248,8 @@ public class SearchTask extends RestTask {
             contentProviderOperations.add(keywordRelationshipContentProviderOperation);
         }
 
-        final ContentResolver contentResolver = getContext().getContentResolver();
+        final Context context = getContext();
+        final ContentResolver contentResolver = context.getContentResolver();
         final ContentProviderResult[] contentProviderResults = contentResolver.applyBatch(EtsyContentProvider.AUTHORITY, contentProviderOperations);
         contentResolver.notifyChange(SearchResultsView.URI, null);
     }

@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Etsy Homework</string>
     <string name="loading">Loading…</string>
+    <string name="click_here_to_load_more_items">Click here to load more items</string>
 </resources>

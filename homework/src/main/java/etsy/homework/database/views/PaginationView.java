@@ -19,6 +19,7 @@ public class PaginationView {
     public static final String CREATE = "CREATE VIEW " + VIEW_NAME + " AS " +
         " SELECT " +
             PaginationTable.TABLE_NAME + "." + PaginationTable.Columns.KEYWORD + " AS " + Columns.KEYWORD + ", " +
+            PaginationTable.TABLE_NAME + "." + PaginationTable.Columns.STATE + " AS " + Columns.STATE + ", " +
             " MAX ( " +
                 PaginationTable.TABLE_NAME + "." + PaginationTable.Columns.NEXT_PAGE +
             " ) " +
@@ -32,6 +33,8 @@ public class PaginationView {
     public static final class Columns {
         public static final String KEYWORD = PaginationTable.Columns.KEYWORD;
         public static final String NEXT_PAGE = PaginationTable.Columns.NEXT_PAGE;
+        public static final String STATE = PaginationTable.Columns.STATE;
     }
 
 }
+
