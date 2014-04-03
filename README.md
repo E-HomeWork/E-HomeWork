@@ -94,10 +94,6 @@ I'm not quite happy with the way I'm using my Constants, although each constant 
 
 I'm currently not using the selection and selectionArgs[] in the Loaders, nor am I using the uri paths to pass in unique keys, instead I am using query parameters and parsing them as needed. The android system recognizes unique paths when it comes time to triggering and responding to notifications, so there will be some places where I needlessly restart the content loader.
 
-The keywords are not being saved between Activity re-creations.
-
-There are many processes in this application with respect to creating and matching database to task to loader etc... but because of the limited amount of time there is to complete this, I will be omit building these stuctures.
-
 
 # Bonus
 
