@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@color/pressed_orange"
+        android:left="@dimen/activity_main_grid_view_cell_spacing"
+        android:right="@dimen/activity_main_grid_view_cell_spacing" />
+</layer-list>

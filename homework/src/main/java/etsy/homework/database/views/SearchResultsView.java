@@ -39,14 +39,14 @@ public class SearchResultsView {
                         " ) " +
                 " AND " +
                     ResultsTable.Columns.LISTING_ID + " NOT IN " +
-                    " ( " +
-                        " SELECT " +
-                            KeywordResultRelationshipTable.Columns.LISTING_ID +
-                        " FROM " +
-                            KeywordResultRelationshipTable.TABLE_NAME +
-                        " WHERE " +
-                            KeywordResultRelationshipTable.Columns.KEYWORD + "<>? " +
-                    " ) " +
+                        " ( " +
+                            " SELECT " +
+                                KeywordResultRelationshipTable.Columns.LISTING_ID +
+                            " FROM " +
+                                KeywordResultRelationshipTable.TABLE_NAME +
+                            " WHERE " +
+                                KeywordResultRelationshipTable.Columns.KEYWORD + "<>? " +
+                        " ) " +
             " ; ";
 
 
@@ -82,7 +82,7 @@ public class SearchResultsView {
                     KeywordResultRelationshipTable.TABLE_NAME + "." + KeywordResultRelationshipTable.Columns.LISTING_ID +
         " UNION " +
             " SELECT " +
-                " '0' AS " + BaseColumns._ID + ", " +
+                PaginationView.VIEW_NAME + "." + PaginationView.Columns.NEXT_PAGE + " AS " + BaseColumns._ID + ", " +
                 " NULL AS " + Columns.DESCRIPTION + ", " +
                 " NULL AS " + Columns.TITLE + ", " +
                 " NULL AS " + Columns.PRICE + ", " +

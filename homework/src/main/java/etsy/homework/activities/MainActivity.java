@@ -20,6 +20,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 import etsy.homework.R;
 import etsy.homework.Utilities.Debug;
 import etsy.homework.adapters.SearchResultsAdapter;
@@ -115,6 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
         mSearchResultsCursorLoader = null;
         mProgressBar = null;
         tearDownActionBar();
+        Crouton.cancelAllCroutons();
     }
 
     @Override
@@ -189,6 +192,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
                     setProgrssBarState(false);
                 } else if (TasksTable.State.FAIL.equals(state)) {
                     setProgrssBarState(false);
+                    Crouton.showText(this, "Unable to retrieve results", Style.ALERT);
                 } else if (TasksTable.State.RUNNING.equals(state)) {
                     setProgrssBarState(true);
                 }
@@ -253,11 +257,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Rest
         final SearchResultsViewType searchResultsViewType = searchResultsAdapter.getSearchResultsViewType(position);
         final Cursor cursor = (Cursor) searchResultsAdapter.getItem(position);
         switch (searchResultsViewType) {
-            case item:
             case pagination:
                 final int nextPageColumnIndex = cursor.getColumnIndex(SearchResultsView.Columns.NEXT_PAGE);
                 final int nextPage = cursor.getInt(nextPageColumnIndex);
-                Toast.makeText(getApplicationContext(), "Next Page: " + nextPage, Toast.LENGTH_SHORT).show();
+                Crouton.showText(this, "Next Page: " + nextPage, Style.ALERT);
+                break;
+            case item:
         }
 
     }

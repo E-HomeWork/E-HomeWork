@@ -1,6 +1,5 @@
 package etsy.homework.rest.tasks;
 
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +20,7 @@ public abstract class RestTask implements Runnable {
     public static final String SCHEMA = "task://";
     public static final String AUTHORITY = "etsy.task";
     public static final Gson GSON = new Gson();
+    public static final String FORCE_REQUEST = "forceRequest";
     private final Context mContext;
     private final Uri mTaskId;
 

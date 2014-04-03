@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.RemoteException;
 
@@ -21,13 +22,16 @@ import org.apache.http.params.HttpParams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import etsy.homework.Utilities.Debug;
+import etsy.homework.database.EtsyDatabase;
 import etsy.homework.database.tables.KeywordResultRelationshipTable;
 import etsy.homework.database.tables.MainImageTable;
 import etsy.homework.database.tables.PaginationTable;
 import etsy.homework.database.tables.ResultsTable;
+import etsy.homework.database.tables.TasksTable;
 import etsy.homework.database.views.SearchResultsView;
 import etsy.homework.models.KeywordResultRelationship;
 import etsy.homework.models.MainImage;
@@ -51,6 +55,7 @@ public class SearchTask extends RestTask {
     private static final int CONNECTION_TIMEOUT = 1000 * 3;
     private static final int SOCKET_TIMEOUT = 1000 * 5;
     private static final String URL = "https://api.etsy.com/v2/listings/active?api_key=liwecjs0c3ssk6let4p1wqt9&includes=MainImage&keywords=%s&page=%d";
+    private static final String UTF8 = "utf-8";
     private final String mKeyword;
     private final int mPage;
 
@@ -65,15 +70,55 @@ public class SearchTask extends RestTask {
         }
     }
 
+
+    private void runFirstPageDeleteOperations() throws RemoteException, OperationApplicationException {
+        final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
+        final boolean isFirstPage = mPage == FIRST_PAGE;
+        if (isFirstPage) {
+
+            // SearchResultsView
+            final String deletSearchResultsSelection = SearchResultsView.Columns.KEYWORD + "=?";
+            final String[] deleteSearchResultsSelectionArguments = new String[]{mKeyword};
+            final ContentProviderOperation deleteSearchResultsContentProviderOperation = ContentProviderOperation.newDelete(SearchResultsView.URI).withSelection(deletSearchResultsSelection, deleteSearchResultsSelectionArguments).build();
+            contentProviderOperations.add(deleteSearchResultsContentProviderOperation);
+
+            // MainImage
+
+            // KeywordRelationship
+            final String deleteKeywordRelationshipSelection = KeywordResultRelationshipTable.Columns.KEYWORD + "=?";
+            final String[] deleteKeywordRelationshipSelectionArguments = new String[]{mKeyword};
+            final ContentProviderOperation deleteKeywordRelationshipContentProviderOperation = ContentProviderOperation.newDelete(KeywordResultRelationshipTable.URI).withSelection(deleteKeywordRelationshipSelection, deleteKeywordRelationshipSelectionArguments).build();
+            contentProviderOperations.add(deleteKeywordRelationshipContentProviderOperation);
+
+            //Task
+            final Uri uri = getUri();
+            final String uriString = uri.toString();
+            final String deleteTableTaskSelectin = TasksTable.Columns.TASK_ID + " LIKE ? AND " + TasksTable.Columns.TASK_ID + " <> ?";
+            final String[] deleteTaskTableSekectionArguments = {"%" + uriString + "%", uriString};
+            final ContentProviderOperation deletetaskTableContentProviderOperation = ContentProviderOperation.newDelete(TasksTable.URI).withSelection(deleteTableTaskSelectin, deleteTaskTableSekectionArguments).build();
+            contentProviderOperations.add(deletetaskTableContentProviderOperation);
+
+            final String deletePaginationSelection = PaginationTable.Columns.KEYWORD + "=?";
+            final String[] deletePaginationSelectionArguments = new String[]{mKeyword};
+            final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
+            contentProviderOperations.add(deletePaginationContentProviderOperation);
+
+            final ContentResolver contentResolver = getContext().getContentResolver();
+            final ContentProviderResult[] contentProviderResults = contentResolver.applyBatch(EtsyContentProvider.AUTHORITY, contentProviderOperations);
+            contentResolver.notifyChange(SearchResultsView.URI, null);
+            contentProviderOperations.clear();
+        }
+    }
     @Override
     public void executeTask() throws Exception {
         Debug.log("mKeyword: " + mKeyword);
-
         if (mKeyword == null || mKeyword.isEmpty()) {
             return;
         }
+        runFirstPageDeleteOperations();
 
-        final String url = String.format(URL, mKeyword, mPage);
+        final String encodedKeyword = URLEncoder.encode(mKeyword, UTF8);
+        final String url = String.format(URL, encodedKeyword, mPage);
         final HttpGet httpget = new HttpGet(url);
         final HttpParams httpParameters = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParameters, CONNECTION_TIMEOUT);
@@ -113,34 +158,19 @@ public class SearchTask extends RestTask {
     private void writeToDatabase(final SearchResponse searchResponse) throws RemoteException, OperationApplicationException {
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
 
-
         final Pagination pagination = searchResponse.getPagination();
         pagination.setKeyword(mKeyword);
-        final int effectiveOffset = pagination.getEffectiveOffset();
-        final boolean isFirstPage = mPage == FIRST_PAGE;
-        if (isFirstPage) {
-            // Pagination
-            final String deletePaginationSelection = PaginationTable.Columns.KEYWORD + "=?";
-            final String[] deletePaginationSelectionArguments = new String[]{mKeyword};
-            final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
-            contentProviderOperations.add(deletePaginationContentProviderOperation);
 
-            // SearchResultsView
-            final String deletSearchResultsSelection = SearchResultsView.Columns.KEYWORD + "=?";
-            final String[] deleteSearchResultsSelectionArguments = new String[]{mKeyword};
-            final ContentProviderOperation deleteSearchResultsContentProviderOperation = ContentProviderOperation.newDelete(SearchResultsView.URI).withSelection(deletSearchResultsSelection, deleteSearchResultsSelectionArguments).build();
-            contentProviderOperations.add(deleteSearchResultsContentProviderOperation);
-
-            // MainImage
-
-            // KeywordRelationship
-            final String deleteKeywordRelationshipSelection = KeywordResultRelationshipTable.Columns.KEYWORD + "=?";
-            final String[] deleteKeywordRelationshipSelectionArguments = new String[]{mKeyword};
-            final ContentProviderOperation deleteKeywordRelationshipContentProviderOperation = ContentProviderOperation.newDelete(KeywordResultRelationshipTable.URI).withSelection(deleteKeywordRelationshipSelection, deleteKeywordRelationshipSelectionArguments).build();
-            contentProviderOperations.add(deleteKeywordRelationshipContentProviderOperation);
-        }
 
         // Pagination
+        final String deletePaginationSelection = PaginationTable.Columns.KEYWORD + "=?";
+        final String[] deletePaginationSelectionArguments = new String[]{mKeyword};
+        final ContentProviderOperation deletePaginationContentProviderOperation = ContentProviderOperation.newDelete(PaginationTable.URI).withSelection(deletePaginationSelection, deletePaginationSelectionArguments).build();
+        contentProviderOperations.add(deletePaginationContentProviderOperation);
+
+        final int effectiveOffset = pagination.getEffectiveOffset();
+
+
         final ContentValues paginationContentValues = pagination.getContentValues();
         final ContentProviderOperation paginationContentProviderOperation = ContentProviderOperation.newInsert(PaginationTable.URI).withValues(paginationContentValues).build();
         contentProviderOperations.add(paginationContentProviderOperation);

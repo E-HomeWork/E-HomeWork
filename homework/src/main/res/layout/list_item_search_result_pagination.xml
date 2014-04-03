@@ -1,13 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/etsy_text_color"
-    android:layout_width="100dp"
-    android:layout_height="100dp">
 
-    <ProgressBar
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/progressBar"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small" />
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal">
 
+    <FrameLayout
+        android:id="@+id/list_item_search_result_imageView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_search_result_image_view_height"
+        android:background="@color/list_item_search_result_background_color_4">
+
+        <ProgressBar
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_item_search_result_imageView"
+        android:background="@drawable/list_item_search_result_title_background">
+
+        <TextView
+            android:id="@+id/list_item_search_result_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/list_item_search_result_price"
+            android:lines="4"
+            android:padding="@dimen/list_item_search_result_title_padding"
+            android:textColor="@color/etsy_text_color"
+            android:textSize="@dimen/list_item_search_result_text_size" />
+
+        <TextView
+            android:id="@+id/list_item_search_result_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/list_item_search_result_title_padding"
+            android:text="@string/loading"
+            android:textColor="@color/list_item_search_result_price"
+            android:textSize="@dimen/list_item_search_result_text_size" />
+    </RelativeLayout>
+
+</RelativeLayout>

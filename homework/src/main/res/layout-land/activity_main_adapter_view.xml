@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <GridView
-        android:id="@+id/activity_main_list_view_search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:cacheColorHint="@color/activity_main_background"
-        android:horizontalSpacing="@dimen/activity_main_grid_view_cell_spacing"
-        android:verticalSpacing="@dimen/activity_main_grid_view_cell_spacing"
-        android:numColumns="@integer/activity_main_grid_view_number_of_columns"
-        android:clipToPadding="false"
-        android:listSelector="@color/list_item_search_result_border"
-        android:padding="@dimen/activity_main_adapter_view_padding" />
+<merge>
+    <include layout="@layout/activity_main_adapter_view_grid_view" />
 </merge>

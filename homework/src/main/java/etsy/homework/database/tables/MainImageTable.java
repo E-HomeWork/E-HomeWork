@@ -16,6 +16,31 @@ public class MainImageTable {
     public static final String URI_PATH = TABLE_NAME;
     public static final Uri URI = Uri.parse(EtsyContentProvider.SCHEMA + EtsyContentProvider.AUTHORITY + "/" + TABLE_NAME);
 
+    public static final String DELETE_KEYWORD_MATCH =
+            " DELETE FROM " +
+                TABLE_NAME +
+            " WHERE " +
+                    Columns.LISTING_ID + " IN " +
+                        " ( " +
+                            " SELECT " +
+                                KeywordResultRelationshipTable.Columns.LISTING_ID +
+                            " FROM " +
+                                KeywordResultRelationshipTable.TABLE_NAME +
+                            " WHERE " +
+                                KeywordResultRelationshipTable.Columns.KEYWORD + "=? " +
+                        " ) " +
+                " AND " +
+                    Columns.LISTING_ID + " NOT IN " +
+                        " ( " +
+                            " SELECT " +
+                                KeywordResultRelationshipTable.Columns.LISTING_ID +
+                            " FROM " +
+                                KeywordResultRelationshipTable.TABLE_NAME +
+                            " WHERE " +
+                                KeywordResultRelationshipTable.Columns.KEYWORD + "<>? " +
+                        " ) " +
+            " ; ";
+
     public static final String CREATE = "CREATE TABLE " + TABLE_NAME + " ( " +
             Columns.LISTING_ID + " INTEGER, " +
             Columns.LISTING_IMAGE_ID + " INTEGER, " +

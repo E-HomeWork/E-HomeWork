@@ -10,8 +10,11 @@
     </style>
 
     <style name="ProgressBarAppTheme" parent="android:Widget.Holo.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/apptheme_progress_horizontal_holo_dark</item>
-        <item name="android:indeterminateDrawable">@drawable/apptheme_progress_indeterminate_horizontal_holo_dark</item>
+        <item name="android:progressDrawable">@drawable/apptheme_progress_horizontal_holo_dark
+        </item>
+        <item name="android:indeterminateDrawable">
+            @drawable/apptheme_progress_indeterminate_horizontal_holo_dark
+        </item>
     </style>
 
     <style name="ActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">

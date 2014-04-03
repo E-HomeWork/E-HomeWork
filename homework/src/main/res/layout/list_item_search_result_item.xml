@@ -3,8 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:background="@color/list_item_search_result_border">
+    android:layout_gravity="center_horizontal">
 
     <ImageView
         android:id="@+id/list_item_search_result_imageView"
@@ -16,10 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/list_item_search_result_imageView"
-        android:layout_marginBottom="@dimen/list_item_search_result_border_size"
-        android:layout_marginLeft="@dimen/list_item_search_result_border_size"
-        android:layout_marginRight="@dimen/list_item_search_result_border_size"
-        android:background="@color/list_item_search_result_title_background">
+        android:background="@drawable/list_item_search_result_title_background">
 
         <TextView
             android:id="@+id/list_item_search_result_title"
@@ -29,18 +25,18 @@
             android:layout_toLeftOf="@+id/list_item_search_result_price"
             android:lines="4"
             android:padding="@dimen/list_item_search_result_title_padding"
-            android:textSize="@dimen/list_item_search_result_text_size"
-            android:textColor="@color/etsy_text_color" />
+            android:textColor="@color/etsy_text_color"
+            android:textSize="@dimen/list_item_search_result_text_size" />
 
         <TextView
             android:id="@+id/list_item_search_result_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:textSize="@dimen/list_item_search_result_text_size"
+            android:layout_centerVertical="true"
             android:padding="@dimen/list_item_search_result_title_padding"
-            android:textColor="@color/list_item_search_result_price" />
+            android:textColor="@color/list_item_search_result_price"
+            android:textSize="@dimen/list_item_search_result_text_size" />
     </RelativeLayout>
 
 </RelativeLayout>

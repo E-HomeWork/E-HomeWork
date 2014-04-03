@@ -11,7 +11,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -34,7 +33,6 @@ public class EtsyContentProvider extends ContentProvider {
 
     public static final String AUTHORITY = "etsy.homework.authority";
     public static final String SCHEMA = "content://";
-    public static final String FORCE_REQUEST = "forceRequest";
     private static final String MIME_TYPE = "mime_type";
     private static final long STALE_DATA_THRESHOLD = 1000 * 30; // 30 seconds
     private final UriMatcher mURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -170,7 +168,7 @@ public class EtsyContentProvider extends ContentProvider {
                     Debug.log("launchNetworkRequest: " + launchNetworkRequest);
                 }
                 final String uriString = uri.getQueryParameter(RestTask.TASK_URI);
-                final String forceRequestString = uri.getQueryParameter(FORCE_REQUEST);
+                final String forceRequestString = uri.getQueryParameter(RestTask.FORCE_REQUEST);
                 final boolean forceRequest = forceRequestString != null && Boolean.parseBoolean(forceRequestString);
                 launchNetworkRequest = forceRequest || launchNetworkRequest && uriString != null;
                 Debug.log("forceRequest: " + forceRequest);
